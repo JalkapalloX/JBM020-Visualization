@@ -1,2 +1,3 @@
-"# JBM020-Visualization" 
-"# JBM020-Visualization" 
+JBM020 - Visualization
+
+Kacper <3
