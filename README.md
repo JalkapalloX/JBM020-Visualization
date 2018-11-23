@@ -1,3 +1,1 @@
-JBM020 - Visualization
-
-Kacper <3
+# JBM020 - Visualization #
