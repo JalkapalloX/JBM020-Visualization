@@ -1,0 +1,133 @@
+#:kivy 1.10.0
+
+<MainScreen>:
+    canvas.before:
+        Rectangle:
+            pos: 0,root.height-20
+            size: root.width,20
+
+    StackLayout:
+        #cols: 4
+
+        # FILE BUTTON
+        Button:
+            # BASE INFORMATION
+            id: file
+            text: "File"
+            halign: "left"
+
+            # SIZE INFORMATION
+            size: 35,20 # SIZE
+            size_hint: None, None # IGNORE AUTO
+            font_size: 11.5
+
+            # COLOR INFORMATION
+            color: 0,0,0,1
+            background_normal: ''
+            background_color: 1,1,1,1
+            background_down: ""
+
+            # EVENT ACTION
+            ### CODE HERE ###
+            on_press: self.background_color = (0.95,0.95,0.95,1)
+            on_release:
+                self.background_color = (1,1,1,1)
+                file_dropdown.open(self)
+            on_parent:
+                file_dropdown.dismiss()
+
+        # EDIT BUTTON
+        Button:
+            # BASE INFORMATION
+            id: edit
+            text: "Edit"
+            halign: "left"
+
+            # SIZE INFORMATION
+            size: 35,20 # SIZE
+            size_hint: None, None # IGNORE AUTO
+            font_size: 11
+
+            # COLOR INFORMATION
+            color: 0,0,0,1
+            background_normal: ''
+            background_color: 1,1,1,1
+            background_down: ""
+
+            # EVENT ACTION
+            ### CODE HERE ###
+            on_press: self.background_color = (0.95,0.95,0.95,1)
+            on_release: self.background_color = (1,1,1,1)
+
+        # PANELS BUTTON
+        Button:
+            # BASE INFORMATION
+            id: panels
+            text: "Panels"
+            halign: "left"
+
+            # SIZE INFORMATION
+            size: 45,20 # SIZE
+            size_hint: None, None # IGNORE AUTO
+            font_size: 11
+
+            # COLOR INFORMATION
+            color: 0,0,0,1
+            background_normal: ''
+            background_color: 1,1,1,1
+            background_down: ""
+
+            # EVENT ACTION
+            ### CODE HERE ###
+            on_press: self.background_color = (0.95,0.95,0.95,1)
+            on_release: self.background_color = (1,1,1,1)
+
+        # PANELS BUTTON
+        Button:
+            # BASE INFORMATION
+            id: options
+            text: "Options"
+            halign: "left"
+
+            # SIZE INFORMATION
+            size: 45,20 # SIZE
+            size_hint: None, None # IGNORE AUTO
+            font_size: 11
+
+            # COLOR INFORMATION
+            color: 0,0,0,1
+            background_normal: ''
+            background_color: 1,1,1,1
+            background_down: ""
+
+            # EVENT ACTION
+            ### CODE HERE ###
+            on_press: self.background_color = (0.95,0.95,0.95,1)
+            on_release: self.background_color = (1,1,1,1)
+
+    BoxLayout:
+        DropDown:
+            id: file_dropdown
+            on_select: file.text = 'Selected value: {}'.format(args[1])
+
+            Button:
+                # BASE INFORMATION
+                id: dropdown_load
+                text: "Load csv"
+                halign: "left"
+
+                # SIZE INFORMATION
+                size: 80,15 # SIZE
+                size_hint: None, None # IGNORE AUTO
+                font_size: 11.5
+
+                # COLOR INFORMATION
+                color: 0,0,0,1
+                background_normal: ''
+                background_color: 1,1,1,1
+                background_down: ""
+
+                # EVENT ACTION
+                ### CODE HERE ###
+                on_press: self.background_color = (0.95,0.95,0.95,1)
+                on_release: self.background_color = (1,1,1,1)
