@@ -1,0 +1,254 @@
+#:kivy 1.10.0
+
+<MainScreen>:
+    canvas.before:
+        Rectangle:
+            pos:100,100
+            size:root.width,root.height
+            on_dropfile:
+                print(path)
+
+        # OPTIONS BAR BACKGROUND
+        Color:
+            rgba: 0.95,0.95,0.95,1
+        Rectangle:
+            pos: 0,0
+            size: 250,root.height
+
+        # TIME SHIFT BAR BACKGROUND
+        Color:
+            rgba: 0.9,0.9,0.9,1
+        Rectangle:
+            pos: 0,0
+            size: root.width,40
+
+        # BORDER LINE OF OPTIONS-BAR
+        Color:
+            rgba: 0.7,0.7,0.7,1
+        Line:
+            points: 250,0,250,root.height
+            width: 1
+
+        # BORDER LINE OF TIME-SHIFT-BAR
+        Color:
+            rgba: 0.7,0.7,0.7,1
+        Line:
+            points: 0,41,root.width,41
+            width: 1
+
+        # BORDER LINE OF MENU
+        Color:
+            rgba: 0.7,0.7,0.7,1
+        Line:
+            points: 0,root.height-20.5, root.width,root.height-20.5
+            width: 1
+
+        # BORDER LINE OF TAB-BAR
+        Color:
+            rgba: 0.7,0.7,0.7,1
+        Line:
+            points: 0,root.height-51, root.width,root.height-51
+            width: 1
+
+        # MENU BACKGROUND
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: 0,root.height-20
+            size: root.width,20
+
+        # TAB BAR BACKGROUND
+        Color:
+            rgba: 0.9,0.9,0.9,1
+        Rectangle:
+            pos: 250.5,root.height-50
+            size: root.width,29
+
+    # GRAPH OPTIONS TEXT
+    Label:
+        # BASE INFORMATION
+        id: graph_options
+        text: "[b]Graph Options[/b]"
+        markup: True
+
+        # SIZE INFORMATION
+        pos: (-root.width/2+40,root.height/2-60)
+        font_size: 11
+
+        # COLOR INFORMATION
+        color: 0,0,0,1
+
+    # CLOSE TAB BUTTON
+    Button:
+        # BASE INFORMATION
+        id: close_tab
+        text: "-"
+
+        # SIZE INFORMATION
+        pos: root.width-30, root.height-50
+        size: 30,29
+        size_hint: None, None
+        font_size: 25
+
+        # COLOR INFORMATION
+        color: 0.5,0.5,0.5,1
+        background_normal: ''
+        background_color: 0.9,0.9,0.9,1
+        background_down: ""
+
+        # EVENT ACTION
+        ### CODE HERE ###
+        on_press: self.background_color = (0.7,0.7,0.7,1)
+        on_release: self.background_color = (0.9,0.9,0.9,1)
+
+    # NEW TAB BUTTON
+    Button:
+        # BASE INFORMATION
+        id: new_tab
+        text: "+"
+
+        # SIZE INFORMATION
+        pos: root.width-60, root.height-50
+        size: 30,29
+        size_hint: None, None
+        font_size: 25
+
+        # COLOR INFORMATION
+        color: 0.5,0.5,0.5,1
+        background_normal: ''
+        background_color: 0.9,0.9,0.9,1
+        background_down: ""
+
+        # EVENT ACTION
+        ### CODE HERE ###
+        on_press: self.background_color = (0.7,0.7,0.7,1)
+        on_release: self.background_color = (0.9,0.9,0.9,1)
+
+    # TEST TAB ### DELETE!!!
+    #Image:
+
+
+    # MENU BAR
+    StackLayout:
+        # FILE BUTTON
+        Button:
+            # BASE INFORMATION
+            id: file
+            text: "File"
+            halign: "left"
+
+            # SIZE INFORMATION
+            size: 35,20 # SIZE
+            size_hint: None, None # IGNORE AUTO
+            font_size: 11.5
+
+            # COLOR INFORMATION
+            color: 0,0,0,1
+            background_normal: ''
+            background_color: 1,1,1,1
+            background_down: ""
+
+            # EVENT ACTION
+            ### CODE HERE ###
+            on_press: self.background_color = (0.95,0.95,0.95,1)
+            on_release:
+                self.background_color = (1,1,1,1)
+                file_dropdown.open(self)
+            on_parent:
+                file_dropdown.dismiss()
+
+        # EDIT BUTTON
+        Button:
+            # BASE INFORMATION
+            id: edit
+            text: "Edit"
+            halign: "left"
+
+            # SIZE INFORMATION
+            size: 35,20 # SIZE
+            size_hint: None, None # IGNORE AUTO
+            font_size: 11
+
+            # COLOR INFORMATION
+            color: 0,0,0,1
+            background_normal: ''
+            background_color: 1,1,1,1
+            background_down: ""
+
+            # EVENT ACTION
+            ### CODE HERE ###
+            on_press: self.background_color = (0.95,0.95,0.95,1)
+            on_release: self.background_color = (1,1,1,1)
+
+        # PANELS BUTTON
+        Button:
+            # BASE INFORMATION
+            id: panels
+            text: "Panels"
+            halign: "left"
+
+            # SIZE INFORMATION
+            size: 45,20 # SIZE
+            size_hint: None, None # IGNORE AUTO
+            font_size: 11
+
+            # COLOR INFORMATION
+            color: 0,0,0,1
+            background_normal: ''
+            background_color: 1,1,1,1
+            background_down: ""
+
+            # EVENT ACTION
+            ### CODE HERE ###
+            on_press: self.background_color = (0.95,0.95,0.95,1)
+            on_release: self.background_color = (1,1,1,1)
+
+        # OPTIONS BUTTON
+        Button:
+            # BASE INFORMATION
+            id: options
+            text: "Options"
+            halign: "left"
+
+            # SIZE INFORMATION
+            size: 55,20 # SIZE
+            size_hint: None, None # IGNORE AUTO
+            font_size: 11
+
+            # COLOR INFORMATION
+            color: 0,0,0,1
+            background_normal: ''
+            background_color: 1,1,1,1
+            background_down: ""
+
+            # EVENT ACTION
+            ### CODE HERE ###
+            on_press: self.background_color = (0.95,0.95,0.95,1)
+            on_release: self.background_color = (1,1,1,1)
+
+    BoxLayout:
+        DropDown:
+            id: file_dropdown
+            on_select: file.text = "Selected value: {}".format(args[1])
+
+            Button:
+                # BASE INFORMATION
+                id: dropdown_load
+                text: "Load csv"
+                halign: "left"
+
+                # SIZE INFORMATION
+                size: 80,15 # SIZE
+                size_hint: None, None # IGNORE AUTO
+                font_size: 11.5
+
+                # COLOR INFORMATION
+                color: 0,0,0,1
+                background_normal: ""
+                background_color: 1,1,1,1
+                background_down: ""
+
+                # EVENT ACTION
+                ### CODE HERE ###
+                on_press: self.background_color = (0.95,0.95,0.95,1)
+                on_release: self.background_color = (1,1,1,1)
