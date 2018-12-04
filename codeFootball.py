@@ -6,6 +6,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.patches import Arc
 import time
+plt.rcParams['figure.figsize'] = 15, 8
+from PIL import Image as PImage
+from scipy.misc import imread
+
+
 os.getcwd()
 os.chdir("/Users/blazejmanczak/Desktop/School/Year2/Q2/Visualization/Project_code/")
 wholeDataset = pd.read_csv('/Users/blazejmanczak/Desktop/School/Year2/Q2/Visualization/Project_code/all_passes.csv')
@@ -49,10 +54,9 @@ def create_div_cols(pitch_devisions, data):
 
 data_no_pitch_part = wholeDataset[wholeDataset['match_id'] == 30695]
 data = create_div_cols(pitch_devisions, data_no_pitch_part).copy()
-#data.isnull().sum()
 
 ### BLAZEJ'S PART BEGIN
-dd = create_div_cols(pitch_devisions, wholeDataset).copy()
+#dd = create_div_cols(pitch_devisions, wholeDataset).copy()
 
 def create_pivot(data, start_time = -1, end_time = -1):
     if start_time == -1 and end_time == -1:
@@ -74,15 +78,8 @@ def create_heat(pivot_table):
     #plt.show()
     return ax
 
-
 pivot_table = create_pivot(data, 0, 100)
-plt.figure(figsize=(10,8))
-k = create_heat(pivot_table)
-k.get_figure().savefig("/Users/blazejmanczak/Desktop/testPhotos" + str(time.time())[:7]  + ".png")
-data.head()
-
-
-## EMILYAN LOOK HERE
+create_heat(pivot_table)
 
 def generate_images(data, minutes, path):
     if (minutes > max(data['mins'])) or (minutes < min(data['mins'])):
@@ -99,15 +96,10 @@ def generate_images(data, minutes, path):
         plot = create_heat(table)
         plot.get_figure().savefig(path + str(i)  + ".png")
 
-generate_images(data, 30, "/Users/blazejmanczak/Desktop/testPhotos/")
-
-
-
 dir = "/Users/blazejmanczak/Desktop/testPhotos/"
-files = sorted([dir + f for f in os.listdir(dir) if f[-3:] == 'png'])
-files
+generate_images(data, 30, dir)
 
-from PIL import Image as PImage
+files = sorted([dir + f for f in os.listdir(dir) if f[-3:] == 'png'])
 
 def loadImages(files):
     # return array of images
@@ -117,24 +109,14 @@ def loadImages(files):
         loadedImages.append(img)
     return loadedImages
 
-
-
-# your images in an array
 imgs = loadImages(files)
+#import pylab as pl
 
-for image in imgs:
-    image
-    time.sleep(2)
-
-from scipy.misc import imread
-import pylab as pl
-
-plt.ion()
-plt.figsize((9,9)) # turn on interactive mode, non-blocking `show`
-for loop in range(0,3):
-    #y = numpy.dot(x, loop)
-    plt.figure()   # create a new figure
-    plt.imshow(imgs[loop])  # plot the figure
+plt.ion() # turn on interactive mode, non-blocking `show`
+for i in range(0,len(files)):
+    plt.figure() # create a new figure
+    plt.axis('off')
+    plt.imshow(imgs[i],interpolation="nearest")   # plot the figure
     plt.show()     # show the figure, non-blocking
     plt.close()
     time.sleep(2)
