@@ -67,7 +67,7 @@ def create_pivot(data, start_time = -1, end_time = -1):
     return pivot_table
 
 def create_heat(pivot_table):
-    ax = sns.heatmap(pivot_table, annot = True)
+    ax = sns.heatmap(pivot_table, annot = True, cmap = "RdYlGn")
     ax.set_xlabel("Destination of the ball")
     ax.set_ylabel("Origin of the ball")
     ax.set_title("Heatmap of passes", weight = "bold")
@@ -80,6 +80,9 @@ plt.figure(figsize=(10,8))
 k = create_heat(pivot_table)
 k.get_figure().savefig("/Users/blazejmanczak/Desktop/testPhotos" + str(time.time())[:7]  + ".png")
 data.head()
+
+
+## EMILYAN LOOK HERE
 
 def generate_images(data, minutes, path):
     if (minutes > max(data['mins'])) or (minutes < min(data['mins'])):
@@ -98,22 +101,43 @@ def generate_images(data, minutes, path):
 
 generate_images(data, 30, "/Users/blazejmanczak/Desktop/testPhotos/")
 
-from scipy.misc import imread
-import pylab as pl
+
 
 dir = "/Users/blazejmanczak/Desktop/testPhotos/"
 files = sorted([dir + f for f in os.listdir(dir) if f[-3:] == 'png'])
 files
 
-img = None
-for f in files:
-    im=pl.imread(f)
-    if img is None:
-        img = pl.imshow(im)
-    else:
-        img.set_data(im)
-    pl.pause(.1)
-    pl.draw()
+from PIL import Image as PImage
+
+def loadImages(files):
+    # return array of images
+    loadedImages = []
+    for image in files:
+        img = PImage.open(image)
+        loadedImages.append(img)
+    return loadedImages
+
+
+
+# your images in an array
+imgs = loadImages(files)
+
+for image in imgs:
+    image
+    time.sleep(2)
+
+from scipy.misc import imread
+import pylab as pl
+
+plt.ion()
+plt.figsize((9,9)) # turn on interactive mode, non-blocking `show`
+for loop in range(0,3):
+    #y = numpy.dot(x, loop)
+    plt.figure()   # create a new figure
+    plt.imshow(imgs[loop])  # plot the figure
+    plt.show()     # show the figure, non-blocking
+    plt.close()
+    time.sleep(2)
 
 
 
