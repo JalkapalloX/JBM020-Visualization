@@ -1,3 +1,8 @@
+# OTHER
+import os
+import utilities
+import plots
+
 # KIVY BASE CAPABILITIES
 from kivy.app import App
 from kivy.lang import Builder
@@ -9,9 +14,11 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
+from kivy.properties import StringProperty
 
 # LAYOUTS
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 
 # DATA ANALYTICS LIBRARY
 import pandas as pd
@@ -19,48 +26,41 @@ import pandas as pd
 # PLOTTING
 import matplotlib.pyplot as plt
 
-# SPECIFY GLOBAL VARIABLES
-file_dropped = False
-n_tabs = 1
-
-# INTEGRATE .KV FILE
-file_kv = Builder.load_file("DNMCS_GUI.kv")
-
 class ImageButton(ButtonBehavior, Image):
     pass
 
-class MainScreen(FloatLayout):
-    def __init__(self, **kwargs):
-        # Inherit Grid Layout Code
-        super(MainScreen, self).__init__(**kwargs)
+class MainScreen(Screen):
+    plot_img = StringProperty('graphs/Yq6OfCt.png')
 
-        # Light grey background
-        Window.clearcolor = (1, 1, 1, 1)
+    def _draw_plot(self):
+        #utilities.wipe("graphs/")
+        #utilities.create_plot()
+        self.plot_img = "graphs/" + os.listdir("graphs/")[0]
+
+    def _draw_all_plots(self):
+        #utilities.wipe("graphs/")
+        #utilities.create_all_plots()
+        self.plot_img = "graphs/" + os.listdir("graphs/")[0]
+
+class DetailViewScreen(Screen):
+    plot_img = StringProperty("")
+
+class ScreenManagement(ScreenManager):
+    pass
+
+# INTEGRATE .KV FILE
+file_kv = Builder.load_file("DNMCS_GUI.kv")
 
 class GUI(App):
     # BUILDING THE GUI (ADDING FUNCTIONALITIES HERE)
     def build(self):
         Window.bind(on_dropfile=self._on_file_drop)
-        return MainScreen()
-
-    def reset_drop(self):
-        global file_dropped
-        file_dropped = False
+        return file_kv
 
     # INTEGRATE FILE DROPPING
     def _on_file_drop(self, window, file_path):
-        # Refer to global file_dropped
-        global file_dropped
-
-        if not file_dropped:
-            data_path = file_path
-            data = pd.read_csv(file_path.decode("utf-8"))
-
-            file_dropped = True
-            drop_information.dismiss()
-            return
-        else:
-            return
+        self.data = utilities.read_data(file_path.decode("utf-8"))
+        return
 
 if __name__ == "__main__":
     GUI().run()
