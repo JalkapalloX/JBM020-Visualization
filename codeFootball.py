@@ -14,8 +14,16 @@ from scipy.misc import imread
 os.getcwd()
 os.chdir("/Users/blazejmanczak/Desktop/School/Year2/Q2/Visualization/Project_code/")
 wholeDataset = pd.read_csv('/Users/blazejmanczak/Desktop/School/Year2/Q2/Visualization/Project_code/all_passes.csv')
-wholeDataset[['start_x','end_x']] = wholeDataset[['start_x','end_x']]/100 * 68 # transofrming x coordinates to width in m
-wholeDataset[['start_y','end_y']] = wholeDataset[['start_y','end_y']]/100 * 105 # transofrming x coordinates to width in m
+
+def convert_to_meters(data, width, length):
+    """Converts the cooridnates to meters"""
+    data = data.copy()
+    data[['start_x','end_x']] = data[['start_x','end_x']]/100 * width # transofrming x coordinates to width in m
+    data[['start_y','end_y']] = data[['start_y','end_y']]/100 * length # transofrming x coordinates to width in m
+    return data
+
+
+wholeDataset = convert_to_meters(wholeDataset,68,105)
 wholeDataset.drop(['a','injurytime_play', 'through_ball', 'throw_ins'], axis = 1, inplace = True)
 
 def make_division(pitch_width, pitch_length, divideByX, divideByY):
@@ -46,11 +54,11 @@ compare_to_part(start_x,start_y, pitch_devisions)
 
 def create_div_cols(pitch_devisions, data):
     """ Adds columns saying what part of the pitch the pass originated from and to which part of the pitch the pass went"""
-
+    data = data.copy()
     data['part_of_origin'] = data.apply(lambda row: compare_to_part(row['start_x'], row['start_y'], pitch_devisions), axis = 1)
     data['part_of_dest'] = data.apply(lambda row: compare_to_part(row['end_x'], row['end_y'], pitch_devisions), axis = 1)
 
-    return data.copy()
+    return data
 
 data_no_pitch_part = wholeDataset[wholeDataset['match_id'] == 30695]
 data = create_div_cols(pitch_devisions, data_no_pitch_part).copy()
@@ -58,13 +66,8 @@ data = create_div_cols(pitch_devisions, data_no_pitch_part).copy()
 ### BLAZEJ'S PART BEGIN
 #dd = create_div_cols(pitch_devisions, wholeDataset).copy()
 
-def create_pivot(data, start_time = -1, end_time = -1):
-    if start_time == -1 and end_time == -1:
-        start_time = min(data['secs'])
-        end_time = max(data['secs'])
-    start = min(data['secs'])*start_time
-    end = max(data['secs'])*end_time
-    data = data[(start<data['secs']) & (data['secs']<end)].copy()
+
+def create_pivot(data):
     part_to_part_count = data.groupby(['part_of_origin', 'part_of_dest']).aggregate(['count'])['action_type']
     part_to_part_count = part_to_part_count.reset_index()
     pivot_table = part_to_part_count.pivot('part_of_origin', 'part_of_dest','count')
@@ -78,10 +81,26 @@ def create_heat(pivot_table):
     #plt.show()
     return ax
 
-pivot_table = create_pivot(data, 0, 100)
+pivot_table = create_pivot(dd)
 create_heat(pivot_table)
+plt.show()
 
-def generate_images(data, minutes, path):
+def filter_time_dimension(data, start_interval, end_interval):
+    """" Takes data as a data frame, start_interval and end_interval in percentages of total match time """
+    return data.loc[(data['minsec']>=max(data['minsec']* start_interval/100)) & (data['minsec']<=max(data['minsec']* end_interval/100))]
+
+def vertex_filter_dimennsion(data, vertices):
+    """
+    Input: data and the list of vertices to included
+    Output: subset of a data frame with only those passes that have both part_of_origin and part_of_dest within the given list of vertices
+    """
+    return data.loc[ (data['part_of_origin'].isin(vertices)) & (data['part_of_dest'].isin(vertices)) ]
+
+
+def generate_images(data, minutes, path):  # I guess we will not be using it but just in case
+    """
+    A function that generates heatmaps given
+    """
     if (minutes > max(data['mins'])) or (minutes < min(data['mins'])):
         return "Invalid step. Please give step between {0} and {1}"
     if not os.path.exists(path):
@@ -97,33 +116,13 @@ def generate_images(data, minutes, path):
         plot.get_figure().savefig(path + str(i)  + ".png")
 
 dir = "/Users/blazejmanczak/Desktop/testPhotos/"
-generate_images(data, 30, dir)
-
-files = sorted([dir + f for f in os.listdir(dir) if f[-3:] == 'png'])
-
-def loadImages(files):
-    # return array of images
-    loadedImages = []
-    for image in files:
-        img = PImage.open(image)
-        loadedImages.append(img)
-    return loadedImages
-
-imgs = loadImages(files)
-#import pylab as pl
-
-plt.ion() # turn on interactive mode, non-blocking `show`
-for i in range(0,len(files)):
-    plt.figure() # create a new figure
-    plt.axis('off')
-    plt.imshow(imgs[i],interpolation="nearest")   # plot the figure
-    plt.show()     # show the figure, non-blocking
-    plt.close()
-    time.sleep(2)
+#generate_images(data, 30, dir)
 
 
 
 ### BLAZEJ'S PART END
+
+
 print("testing {0}".format(max(data['mins'])))
 
 ### KACPER'S PART BEGIN
