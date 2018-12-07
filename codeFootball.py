@@ -63,7 +63,7 @@ def create_div_cols(pitch_devisions, data):
 data_no_pitch_part = wholeDataset[wholeDataset['match_id'] == 30695]
 data = create_div_cols(pitch_devisions, data_no_pitch_part).copy()
 
-### BLAZEJ'S PART BEGIN
+### BLAZEJ'S PART  ASS 3 BEGIN
 #dd = create_div_cols(pitch_devisions, wholeDataset).copy()
 
 
@@ -84,18 +84,6 @@ def create_heat(pivot_table):
 pivot_table = create_pivot(dd)
 create_heat(pivot_table)
 plt.show()
-
-def filter_time_dimension(data, start_interval, end_interval):
-    """" Takes data as a data frame, start_interval and end_interval in percentages of total match time """
-    return data.loc[(data['minsec']>=max(data['minsec']* start_interval/100)) & (data['minsec']<=max(data['minsec']* end_interval/100))]
-
-def vertex_filter_dimennsion(data, vertices):
-    """
-    Input: data and the list of vertices to included
-    Output: subset of a data frame with only those passes that have both part_of_origin and part_of_dest within the given list of vertices
-    """
-    return data.loc[ (data['part_of_origin'].isin(vertices)) & (data['part_of_dest'].isin(vertices)) ]
-
 
 def generate_images(data, minutes, path):  # I guess we will not be using it but just in case
     """
@@ -118,14 +106,10 @@ def generate_images(data, minutes, path):  # I guess we will not be using it but
 dir = "/Users/blazejmanczak/Desktop/testPhotos/"
 #generate_images(data, 30, dir)
 
+### BLAZEJ'S PART ASS 3END
 
 
-### BLAZEJ'S PART END
-
-
-print("testing {0}".format(max(data['mins'])))
-
-### KACPER'S PART BEGIN
+### KACPER'S PART ASS 3 BEGIN
 dd = create_div_cols(pitch_devisions, wholeDataset).copy()
 
 #run this for making heatmap with 30 sec intervals on x axis and parts of field on y axis and color variable counts of passes
@@ -147,3 +131,20 @@ fig_heatmap2.set_title("Heat map of count of passes(dest) by intervals plotted a
 fig_heatmap2.set_xlabel("30sec Intervals", size = 14);
 fig_heatmap2.set_ylabel("Part in field", size = 14);
 plt.show()
+
+### KACPER'S PART ASS 3 END
+
+### BLAZEJ'S PART ASS 4 BEGIN
+
+def filter_time_dimension(data, start_interval, end_interval):
+    """" Takes data as a data frame, start_interval and end_interval in percentages of total match time """
+    return data.loc[(data['minsec']>=max(data['minsec']* start_interval/100)) & (data['minsec']<=max(data['minsec']* end_interval/100))]
+
+def vertex_filter_dimennsion(data, vertices):
+    """
+    Input: data and the list of vertices to included
+    Output: subset of a data frame with only those passes that have both part_of_origin and part_of_dest within the given list of vertices
+    """
+    return data.loc[ (data['part_of_origin'].isin(vertices)) & (data['part_of_dest'].isin(vertices)) ]
+
+### BLAZEJ'S PART ASS 4 END
