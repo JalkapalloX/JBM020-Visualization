@@ -81,7 +81,7 @@ def create_heat(pivot_table):
     #plt.show()
     return ax
 
-pivot_table = create_pivot(dd)
+pivot_table = create_pivot(data)
 create_heat(pivot_table)
 plt.show()
 
@@ -147,4 +147,60 @@ def vertex_filter_dimennsion(data, vertices):
     """
     return data.loc[ (data['part_of_origin'].isin(vertices)) & (data['part_of_dest'].isin(vertices)) ]
 
+def edge_filter_dimension(pivot_table, weight_thresh):
+    """
+    Returns a copy if input pivot table later used to create heatmaps with weights strictly smaller
+    than given weight_thresh subsitued to NaN values
+    """
+    pivot_no_weights = pivot_table.copy()
+    x_shape = pivot_table.shape[0]
+    y_shape = pivot_table.shape[0]
+    for a in range (1, x_shape +1):
+        for b in range (1, y_shape+1):
+            if (pivot_no_weights[a][b] < weight_thresh):
+                pivot_no_weights[a][b] = np.nan
+    return pivot_no_weights
+
+create_heat(edge_filter_dimension(pivot_table, 4))
+plt.show()
+
+
 ### BLAZEJ'S PART ASS 4 END
+
+# match to experiment on 30695
+
+def get_match(match_id, data):
+    return data[data["match_id"] == match_id]
+
+
+direc = "C:/Users/Hermii/Desktop/Vizualizations/heats/"
+
+
+def create_heat_modified(pivot_table, c, b, round_minut_param):
+    ax = sns.heatmap(pivot_table, annot=True, cmap="Blues")
+    ax.set_xlabel("Destination of the ball")
+    ax.set_ylabel("Origin of the ball")
+    ax.set_title("Heatmap of passes " + str(round(b / 60, round_minut_param)) + "min - " + str(
+        round(c / 60, round_minut_param)) + "min", weight="bold")
+    # plt.show()
+    return ax
+
+
+def generate_images(data_full, parts_to_divide, path, match_id, round_minut_param):
+    if not os.path.exists(path):
+        os.makedirs(path)
+    match_data = get_match(match_id, data)
+    step = match_data["minsec"].max() / parts_to_divide
+    c = step
+    b = 0
+    for i in range(1, parts_to_divide + 1):
+        subset_data = data[data["minsec"].between(b, c)]
+        table = create_pivot(subset_data)
+        plot = create_heat_modified(table, c, b, round_minut_param)
+        plot.get_figure().savefig(path + str(i) + ".png")
+        plt.clf()
+        c += step
+        b += step
+
+
+generate_images(wholeDataset, 20, direc, 30695, 1)
