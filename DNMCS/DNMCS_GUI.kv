@@ -1,260 +1,374 @@
 #:kivy 1.10.0
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+
+ScreenManagement:
+	id: screen_manager
+	transition: FadeTransition()
+	MainScreen:
+		name: "main"
+	    id: main
+		manager: screen_manager
+	DetailViewScreen:
+		name: "detail"
+	    id: detail
+		manager: screen_manager
+
+		# GET VARIABLE FROM MAIN FRAME
+		plot_img: main.plot_img
+
 
 <MainScreen>:
-    # ~~~~~~~~ BASIC SHAPES OF THE GUI ~~~~~~~~ #
-    canvas.before:
-        Rectangle:
-            pos:100,100
-            size:root.width,root.height
+    FloatLayout:
+        # ~~~~~~~~ BASIC SHAPES OF THE GUI ~~~~~~~~ #
+        canvas.before:
+            Color:
+                rgba: 0.95,0.95,0.95,1
+            Rectangle:
+                pos: 0,0
+                size: root.width,root.height
 
-        # OPTIONS BAR BACKGROUND
-        Color:
-            rgba: 0.95,0.95,0.95,0.9
-        Rectangle:
-            pos: 0,0
-            size: 250,root.height
-            source: "Rainbow Gradient.png"
-        Rectangle:
-            pos: 0,0
-            size: 250,root.height
+            # OPTIONS BAR BACKGROUND
+            Color:
+                rgba: 0.93,0.93,0.93,0.9
+            Rectangle:
+                pos: 0,0
+                size: 300,root.height-40
+                source: "Rainbow Gradient.png"
+            Rectangle:
+                pos: 0,0
+                size: 300,root.height - 40
 
-        # TIME SHIFT BAR BACKGROUND
-        Color:
-            rgba: 0.9,0.9,0.9,1
-        Rectangle:
-            pos: 0,0
-            size: root.width,40
+            # TIME SHIFT BAR BACKGROUND
+            Color:
+                rgba: 0.9,0.9,0.9,1
+            Rectangle:
+                pos: 301,0
+                size: root.width-550,40
 
-        # BORDER LINE OF OPTIONS-BAR
-        Color:
-            rgba: 0.7,0.7,0.7,1
-        Line:
-            points: 250,0,250,root.height
-            width: 1
+            # BORDER LINE OF OPTIONS-BAR
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Line:
+                points: 300,0,300,root.height-40
+                width: 1
 
-        # BORDER LINE OF TIME-SHIFT-BAR
-        Color:
-            rgba: 0.7,0.7,0.7,1
-        Line:
-            points: 0,41,root.width,41
-            width: 1
+            # BORDER LINE OF INFORMATION-BAR
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Line:
+                points: root.width-250,0,root.width-250,root.height-40
+                width: 1
 
-        # BORDER LINE OF MENU
-        Color:
-            rgba: 0.7,0.7,0.7,1
-        Line:
-            points: 0,root.height-20.5, root.width,root.height-20.5
-            width: 1
+            # BORDER LINE OF TIME-SHIFT-BAR
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Line:
+                points: 301,41,root.width-250,41
+                width: 1
 
-        # BORDER LINE OF PLOT-BAR
-        Color:
-            rgba: 0.7,0.7,0.7,1
-        Line:
-            points: 250.5,root.height-131, root.width,root.height-131
-            width: 1
+            # TAB BAR BACKGROUND
+            Color:
+                rgba: 0.9,0.9,0.9,0.5
+            Rectangle:
+                pos: 0,root.height-40
+                size: root.width,40
+                source: "gray-gradient.png"
+            Rectangle:
+                pos: 0,root.height-40
+                size: root.width,40
 
-        # MENU BACKGROUND
-        Color:
-            rgba: 1,1,1,1
-        Rectangle:
-            pos: 0,root.height-20
-            size: root.width,20
+            # BORDER LINE OF PLOT-BAR
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Line:
+                points: 0,root.height-81,root.width,root.height-81
+                width: 1
 
-        # TAB BAR BACKGROUND
-        Color:
-            rgba: 0.9,0.9,0.9,0.7
-        Rectangle:
-            pos: 250.5,root.height-50
-            size: root.width,29
-            source: "gray-gradient.png"
-        Rectangle:
-            pos: 250.5,root.height-50
-            size: root.width,29
+            # BORDER LINE OF SHIFT SELECTION BUTTON
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Rectangle:
+                # SIZE INFORMATION
+                pos: 99.5, root.height-830.5
+                size: 161,21
 
-        # PLOT BAR BACKGROUND
-        Color:
-            rgba: 0.95,0.95,0.95,1
-        Rectangle:
-            pos: 250.5,root.height-131
-            size: root.width,79
+            # BORDER LINE OF GRAPH TYPE BUTTON
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Rectangle:
+                # SIZE INFORMATION
+                pos: 99.5, root.height-240.5
+                size: 161,21
 
-        # BORDER LINE OF TAB-BAR
-        Color:
-            rgba: 0.7,0.7,0.7,1
-        Line:
-            points: 0,root.height-51, root.width,root.height-51
-            width: 1
+            # # BLACK BORDER LINE OF PLOT
+            # Color:
+            #     rgba: 0.3,0.3,0.3,1
+            # Rectangle:
+            #     # SIZE INFORMATION
+            #     pos: 355,95
+            #     size: root.width-660,root.height-240
 
-    Label:
-        id: drop_information
-        text: "[b]Drop your file anywhere\nand start exploring![/b]"
-        markup: True
+            # BORDER LINE OF PLOT
+            Color:
+                rgba: 0.9,0.9,0.9,1
+            Rectangle:
+                # SIZE INFORMATION
+                pos: 360,100
+                size: root.width-670,root.height-250
 
-        pos: root.width/8+25,0
-        halign: "center"
+            # BORDER LINE OF SHIFT OPTIONS
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Line:
+                points: 0,root.height-780, 300,root.height-780
+                width: 1
 
-        font_size: 25
-        color: 0.1,0.1,0.1,1
+            # BORDER LINE OF GRAPH OPTIONS
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Line:
+                points: 0,root.height-185, 300,root.height-185
+                width: 1
 
-    # GRAPH OPTIONS TEXT
-    Label:
-        # BASE INFORMATION
-        id: graph_options
-        text: "[b]Graph Options[/b]"
-        markup: True
-
-        # SIZE INFORMATION
-        pos: -root.width/2+41,root.height/2-61
-        font_size: 11
-
-        # COLOR INFORMATION
-        color: 0.1,0.1,0.1,1
-
-    # NEW TAB BUTTON
-    Button:
-        # BASE INFORMATION
-        id: new_tab
-        text: "+"
-
-        # SIZE INFORMATION
-        pos: root.width-30, root.height-50
-        size: 30,29
-        size_hint: None, None
-        font_size: 25
-
-        # COLOR INFORMATION
-        color: 0.5,0.5,0.5,1
-        background_normal: ''
-        background_color: 0,0,0,0
-        background_down: ""
-
-        # EVENT ACTION
-        on_press: self.background_color = (0.7,0.7,0.7,1)
-        on_release: self.background_color = (0,0,0,0)
-
-    # PLAY PAUSE BUTTON
-    ImageButton:
-        id: play
-        source:'Play Button Light.png'
-        text: "Text"
-        size_hint: None, None
-        size: 50,70
-        pos: 90,-15
-        on_press:
-            print("Play")
-            self.source = "Pause Button Light.png"
-
-    # # PLAY PAUSE BUTTON
-    # ImageButton:
-    #     id: heatmap_symbol
-    #     source:'heatmap_symbol.png'
-    #     size_hint: None, None
-    #     size: 60,65
-    #     pos: 280,root.height-123
-    #
-    # # PLAY PAUSE BUTTON
-    # ImageButton:
-    #     id: heatmap_symbol
-    #     source:'nodelink_symbol.png'
-    #     size_hint: None, None
-    #     size: 60,65
-    #     pos: 365,root.height-123
+        ImageButton:
+            id: plot
+            source: root.plot_img
+            size: root.width-668,root.height-248
+            size_hint: None,None
+            pos: 361, 101
+            on_release:
+                app.root.current = "detail"
 
 
-    # Slider:
-    #     pos: 275,-27.5
-    #     size_hint: None, None
-    #     width: root.width - 300
-    #     color: 1,1,1,1
-
-    # ~~~~~~~~ MENU BAR ~~~~~~~~ #
-    StackLayout:
-        # FILE BUTTON
-        Button:
+        # GRAPH OPTIONS TEXT
+        Label:
             # BASE INFORMATION
-            id: file
-            text: "File"
-            halign: "left"
+            id: general_information
+            text: "[b]General Information[/b]"
+            markup: True
 
             # SIZE INFORMATION
-            size: 35,20 # SIZE
-            size_hint: None, None # IGNORE AUTO
+            pos: -root.width/2+56,root.height/2-101
             font_size: 11.5
 
             # COLOR INFORMATION
-            color: 0,0,0,1
-            background_normal: ''
-            background_color: 1,1,1,1
-            background_down: ""
+            color: 0.1,0.1,0.1,1
 
-            # EVENT ACTION
-            on_press: self.background_color = (0.95,0.95,0.95,1)
-            on_release:
-                self.background_color = (1,1,1,1)
-                app.reset_drop()
-
-        # EDIT BUTTON
-        Button:
+        # GRAPH OPTIONS TEXT
+        Label:
             # BASE INFORMATION
-            id: edit
-            text: "Edit"
-            halign: "left"
+            id: graph_options
+            text: "[b]Graph Options[/b]"
+            markup: True
 
             # SIZE INFORMATION
-            size: 35,20 # SIZE
-            size_hint: None, None # IGNORE AUTO
+            pos: -root.width/2+42,root.height/2-201
+            font_size: 11.5
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+        # SHIFT OPTIONS TEXT
+        Label:
+            # BASE INFORMATION
+            id: shift_options
+            text: "[b]Shift Options[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: -root.width/2+41,root.height/2-795
+            font_size: 11.5
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+        # SHIFT OVER TEXT
+        Label:
+            # BASE INFORMATION
+            id: shift_over
+            text: "Shift over"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+71,root.height/2-820
+            font_size: 11.5
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+        # SHIFT OVER TEXT
+        Label:
+            # BASE INFORMATION
+            id: dataset
+            text: "Dataset"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+71,root.height/2-125
+            font_size: 11.5
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+        # SHIFT OVER TEXT
+        Label:
+            # BASE INFORMATION
+            id: full_path
+            text: "Full Path"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+69,root.height/2-145
+            font_size: 11.5
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+        # PLAY PAUSE BUTTON
+        ImageButton:
+            id: play
+            source:'play-button.png'
+            size_hint: None, None
+            size: 50,70
+            pos: 120,-15
+            on_press:
+                print("Play")
+                self.source = "Pause Button Light.png"
+
+        # PLAY PAUSE BUTTON
+        ImageButton:
+            id: termination
+            source:'termination-button.png'
+            size_hint: None, None
+            size: 50,70
+            pos: 180,-16
+
+        # HEATMAP BUTTON
+        ImageButton:
+            id: heatmap
+            source:'heatmap.png'
+            size_hint: None, None
+            size: 50,70
+            pos: 305,root.height-95
+
+        # NODE LINK BUTTON
+        ImageButton:
+            id: nodelink
+            source:'node_link.png'
+            size_hint: None, None
+            size: 50,70
+            pos: 340,root.height-95
+
+        # SHIFT SELECTION BUTTON
+        Button:
+            # BASE INFORMATION
+            id: shift_column
+            text: "Select Column"
+
+            # SIZE INFORMATION
+            pos: 100, root.height-830
+            size: 160,20
+            size_hint: None, None
+            font_size: 11
+            halign: "left"
+            valign: "center"
+            padding_x: 5
+            text_size: self.size
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+            background_normal: ''
+            background_color: 0.97,0.97,0.97,1
+            background_down: ""
+
+        # GRAPH TYPE BUTTON
+        Button:
+            # BASE INFORMATION
+            id: graph_type
+            text: "Select Graph Type"
+
+            # SIZE INFORMATION
+            pos: 100, root.height-240
+            size: 160,20
+            size_hint: None, None
+            font_size: 11
+            halign: "left"
+            valign: "center"
+            padding_x: 5
+            text_size: self.size
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+            background_normal: ''
+            background_color: 0.97,0.97,0.97,1
+            background_down: ""
+
+        # PLOT ALL BUTTON
+        Button:
+            # BASE INFORMATION
+            id: plot_all
+            text: "[b]PLOT ALL[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: 70, root.height-950
+            size: 160,25
+            size_hint: None, None
             font_size: 11
 
             # COLOR INFORMATION
-            color: 0,0,0,1
+            color: 0.95,0.95,0.95,1
             background_normal: ''
-            background_color: 1,1,1,1
+            background_color: 0.5,0.5,1,1
             background_down: ""
 
-            # EVENT ACTION
-            on_press: self.background_color = (0.95,0.95,0.95,1)
-            on_release: self.background_color = (1,1,1,1)
-
-        # PANELS BUTTON
+        # PLOT BUTTON
         Button:
             # BASE INFORMATION
-            id: panels
-            text: "Panels"
-            halign: "left"
+            id: plot
+            text: "[b]PLOT[/b]"
+            markup: True
 
             # SIZE INFORMATION
-            size: 45,20 # SIZE
-            size_hint: None, None # IGNORE AUTO
+            pos: 70, root.height-750
+            size: 160,25
+            size_hint: None, None
             font_size: 11
 
             # COLOR INFORMATION
-            color: 0,0,0,1
+            color: 0.95,0.95,0.95,1
             background_normal: ''
-            background_color: 1,1,1,1
+            background_color: 0.5,0.5,1,1
             background_down: ""
 
-            # EVENT ACTION
-            on_press: self.background_color = (0.95,0.95,0.95,1)
-            on_release: self.background_color = (1,1,1,1)
+            on_press:
+                root._draw_plot()
+                plot.source = root.plot_img
 
-        # OPTIONS BUTTON
-        Button:
-            # BASE INFORMATION
-            id: options
-            text: "Options"
-            halign: "left"
+        # TIME SHIFT SLIDER
+        Slider:
+            pos: 325,-27.5
+            size_hint: None, None
+            width: root.width - 600
 
-            # SIZE INFORMATION
-            size: 55,20 # SIZE
-            size_hint: None, None # IGNORE AUTO
-            font_size: 11
+        # # INTERVAL SLIDER
+        # Slider:
+        #     pos: 85,root.height-940
+        #     size_hint: None, None
+        #     width: 190
+        #
+        # # STEP NUMBER SLIDER
+        # Slider:
+        #     pos: 85,root.height-920
+        #     size_hint: None, None
+        #     width: 190
 
-            # COLOR INFORMATION
-            color: 0,0,0,1
-            background_normal: ''
-            background_color: 1,1,1,1
-            background_down: ""
-
-            # EVENT ACTION
-            on_press: self.background_color = (0.95,0.95,0.95,1)
-            on_release: self.background_color = (1,1,1,1)
+<DetailViewScreen>:
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: 0,0
+            size: root.width, root.height
+    ImageButton:
+        source: root.plot_img
+    	on_release: app.root.current = "main"
+        size_hint: None, None
+        size: root.width,root.height
