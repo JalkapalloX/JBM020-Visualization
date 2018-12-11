@@ -106,6 +106,7 @@ def generate_images(data, minutes, path):  # I guess we will not be using it but
 dir = "/Users/blazejmanczak/Desktop/testPhotos/"
 #generate_images(data, 30, dir)
 
+data
 ### BLAZEJ'S PART ASS 3END
 
 
@@ -136,9 +137,20 @@ plt.show()
 
 ### BLAZEJ'S PART ASS 4 BEGIN
 
-def filter_time_dimension(data, start_interval, end_interval):
-    """" Takes data as a data frame, start_interval and end_interval in percentages of total match time """
-    return data.loc[(data['minsec']>=max(data['minsec']* start_interval/100)) & (data['minsec']<=max(data['minsec']* end_interval/100))]
+def filter_time_dimension_min(data, start_interval, end_interval):
+    """"
+    Takes data as a data frame, start_interval and end_interval in minutes.
+    Return a data frame with data only withinh specified time interval
+    """
+    return data[data['mins'].between(start_interval,end_interval)]
+
+def filter_time_dimension_sec(data, start_interval, end_interval):
+    """"
+    Takes data as a data frame, start_interval and end_interval in seconds.
+    Return a data frame with data only withinh specified time interval
+    """
+    return data[data['minsec'].between(start_interval,end_interval)]
+
 
 def vertex_filter_dimennsion(data, vertices):
     """
@@ -149,7 +161,7 @@ def vertex_filter_dimennsion(data, vertices):
 
 def edge_filter_dimension(pivot_table, weight_thresh):
     """
-    Returns a copy if input pivot table later used to create heatmaps with weights strictly smaller
+    Returns a copy of the input pivot table later used to create heatmaps with weights strictly smaller
     than given weight_thresh subsitued to NaN values
     """
     pivot_no_weights = pivot_table.copy()
@@ -161,8 +173,7 @@ def edge_filter_dimension(pivot_table, weight_thresh):
                 pivot_no_weights[a][b] = np.nan
     return pivot_no_weights
 
-create_heat(edge_filter_dimension(pivot_table, 4))
-plt.show()
+
 
 
 ### BLAZEJ'S PART ASS 4 END
@@ -174,7 +185,7 @@ def get_match(match_id, data):
 
 
 direc = "C:/Users/Hermii/Desktop/Vizualizations/heats/"
-
+direc = "/Users/blazejmanczak/Desktop/testPhotos"
 
 def create_heat_modified(pivot_table, c, b, round_minut_param):
     ax = sns.heatmap(pivot_table, annot=True, cmap="Blues")
@@ -186,6 +197,7 @@ def create_heat_modified(pivot_table, c, b, round_minut_param):
     return ax
 
 
+
 def generate_images(data_full, parts_to_divide, path, match_id, round_minut_param):
     if not os.path.exists(path):
         os.makedirs(path)
@@ -194,7 +206,7 @@ def generate_images(data_full, parts_to_divide, path, match_id, round_minut_para
     c = step
     b = 0
     for i in range(1, parts_to_divide + 1):
-        subset_data = data[data["minsec"].between(b, c)]
+        subset_data = filter_time_dimension_sec(data, b, c)
         table = create_pivot(subset_data)
         plot = create_heat_modified(table, c, b, round_minut_param)
         plot.get_figure().savefig(path + str(i) + ".png")
