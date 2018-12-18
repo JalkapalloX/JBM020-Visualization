@@ -174,11 +174,35 @@ def edge_filter_dimension(pivot_table, weight_thresh):
     return pivot_no_weights
 
 
+part_to_part_count = data.groupby(['part_of_origin', 'part_of_dest']).aggregate(['count'])['action_type']
+g = part_to_part_count['count'].groupby(level=0, group_keys=False)
+g.nlargest()
+part_to_part_count = part_to_part_count.reset_index()
+part_to_part_count
+pivot_table = part_to_part_count.pivot('part_of_origin', 'part_of_dest','count')
 
 
+def plotMatrixReorderd(pivot_table):
+    pivot_table.fillna(0)
+    ax = sns.clustermap(pivot_table.fillna(0), cmap="Blues")
+    #ax.ax_heatmap.set_title('Hierachically clustered heatmap of passes', weight = "bold") 
+    plt.show()
+
+plotMatrixReorderd(pivot_table)
+
+
+ax.savefig("bestClusterMapEver.png")
+pivot_table.to_dict().values()
+pivot_table.values()
+data.values()
+
+a = np.array([[1,4,5],[12,15,18], [22,np.nan, 44]])
+a.sort(axis = 1)
+a
 ### BLAZEJ'S PART ASS 4 END
 
 # match to experiment on 30695
+
 
 def get_match(match_id, data):
     return data[data["match_id"] == match_id]
