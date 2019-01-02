@@ -1,0 +1,1541 @@
+#:kivy 1.10.0
+#:import NoTransition kivy.uix.screenmanager.NoTransition
+
+ScreenManagement:
+	id: screen_manager
+	transition: NoTransition()
+	MainScreen:
+		name: "main"
+	    id: main
+		manager: screen_manager
+	CodeScreen:
+		name: "code"
+	    id: code
+		manager: screen_manager
+
+<MainScreen>:
+	plot_type_dropdown: plot_type_dropdown.__self__
+	color_scheme_dropdown: color_scheme_dropdown.__self__
+
+    FloatLayout:
+		id: whole_screen
+        canvas.before:
+			# BACKGROUND
+            Color:
+                rgba: 0.97,0.97,0.97,1
+            Rectangle:
+                pos: 0,0
+                size: root.width,root.height
+
+			Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                pos: 300,0
+                size: root.width-250,root.height-80
+
+            # OPTIONS BAR BACKGROUND
+            Color:
+                rgba: 0.96,0.96,0.96,0.85
+            Rectangle:
+                pos: 0,0
+                size: 300,root.height-40
+                source: "templates/rainbow_gradient.png"
+            Rectangle:
+                pos: 0,0
+                size: 300,root.height - 40
+
+			# DATA BAR BACKGROUND
+            Color:
+                rgba: 0.97,0.97,0.97,1
+            Rectangle:
+                pos: 300,0
+                size: 200,root.height-40
+
+			# 0.7,0.7,0.7,1 - HIGHLIGHTING, BORDERS
+			Color:
+                rgba: 0.7,0.7,0.7,1
+
+			# DATA DRAGABLE BUTTON BACKGROUND
+			Rectangle:
+                pos: 324.5,root.height-560.5
+                size: 151,301
+			# SHOW DATA BACKGROUND
+			Rectangle:
+                pos: 324.5,root.height-590.5
+                size: 151,26
+			# BORDER LINE OF OPTIONS-BAR
+            Line:
+                points: 299.5,0,299.5,root.height-40
+
+			# DATA DRAGABLE BUTTON BACKGROUND
+			Color:
+                rgba: 0.99,0.99,0.99,1
+            Rectangle:
+                pos: 325,root.height-560
+                size: 150,300
+
+			# BORDER LINE OF DATA BAR
+            Color:
+                rgba: 0.8,0.8,0.8,1
+            Line:
+                points: 499.5,0,499.5,root.height-80
+
+            # TAB BAR BACKGROUND
+            Color:
+                rgba: 0.9,0.9,0.9,0.5
+            Rectangle:
+                pos: 0,root.height-40
+                size: root.width,40
+                source: "templates/gray_gradient.png"
+            Rectangle:
+                pos: 0,root.height-40
+                size: root.width,40
+
+            # BORDER LINE OF PLOT-BAR
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Line:
+                points: 0,root.height-81,root.width,root.height-81
+			# BORDER LINE OF COLOR SCHEME BUTTON
+            Rectangle:
+                pos: 99, root.height-321
+                size: 177,27
+			# BORDER LINE PLOT TYPE CHOICE BUTTON
+            Rectangle:
+                pos: 99.5, root.height-281.5
+                size: 161,21
+			# BOTTOM BORDER LINE
+            Line:
+                points: 0,root.height-835, 300,root.height-835
+                #width: 1
+            # BORDER LINE OF TEMPORARY BUTTONS OPTIONS
+            Line:
+                points: 25,root.height-340, 275,root.height-340
+            # BORDER LINE OF GRAPH OPTIONS
+            Line:
+                points: 0,root.height-225, 300,root.height-225
+
+			# BORDER LINE OF COLUMNS
+            Color:
+                rgba: 0.8,0.8,0.8,1
+            Line:
+                points: 325,root.height-225, 475,root.height-225
+			# BORDER LINE OF DIMENSIONS
+            Line:
+                points: 325,root.height-615, 475,root.height-615
+
+		# PLOT
+        ImageButton:
+            id: plot
+            source: root.plot_img
+            size: root.width-501,root.height-82
+            size_hint: None,None
+            pos: 501, 0
+
+		DropDestinationButton:
+			id: which_color
+			text: "[b]Color[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            pos: 325, root.height-710
+            size: (70,60)
+            size_hint: None, None
+			halign: "center"
+			valign: "bottom"
+			padding_y: 5
+			font_size: 11
+			text_size: self.size
+
+			# COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: 'templates/drop_button.png'
+
+			drop_func: root.which_color_update
+			on_release: root.color_column = ""
+
+		Label:
+			text: root.color_column
+			pos: 311, root.height-668
+			halign: "center"
+			valign: "bottom"
+            size_hint: None, None
+			font_size: 10
+			text_size: self.size
+			color: 0.1,0.1,0.1,1
+
+		DropDestinationButton:
+			id: which_filter
+			text: "[b]Filter[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            pos: 405, root.height-710
+            size: (70,60)
+            size_hint: None, None
+			halign: "center"
+			valign: "bottom"
+			padding_y: 5
+			font_size: 11
+			text_size: self.size
+
+			# COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: 'templates/drop_button.png'
+			on_release: root.filter_column = ""
+			drop_func: root.which_filter_update
+
+		Label:
+			text: root.filter_column
+			pos: 391, root.height-668
+			halign: "center"
+			valign: "bottom"
+            size_hint: None, None
+			font_size: 10
+			text_size: self.size
+			color: 0.1,0.1,0.1,1
+
+        # GRAPH OPTIONS TEXT
+        Label:
+            # BASE INFORMATION
+            id: general_information
+            text: "[b]General Information[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: -root.width/2+66,root.height/2-101
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+        # GRAPH OPTIONS TEXT
+        Label:
+            # BASE INFORMATION
+            id: graph_options
+            text: "[b]Graph Options[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: -root.width/2+52,root.height/2-241
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# COLUMNS TEXT
+        Label:
+            # BASE INFORMATION
+            id: graph_options
+            text: "[b]Columns[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: -root.width/2+340,root.height/2-241
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# DIMENSIONS TEXT
+        Label:
+            # BASE INFORMATION
+            id: dimensions
+            text: "[b]Dimensions[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: -root.width/2+350,root.height/2-630
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# COLOR SCHEME TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Scheme"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+62,root.height/2-307
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# PLOT TYPE TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Type"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+70,root.height/2-270
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+        # DATASET TEXT
+        Label:
+            # BASE INFORMATION
+            id: dataset
+            text: "Dataset"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+66,root.height/2-130
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# DATASET NAME TEXT
+        Label:
+            # BASE INFORMATION
+            id: dataset_name
+            text: root.data_name
+			markup: True
+
+            # SIZE INFORMATION
+            pos: 102,root.height-139
+            font_size: 12
+			halign: "left"
+			valign: "bottom"
+			text_size: self.size
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# FULL PATH TEXT
+        Label:
+            # BASE INFORMATION
+            id: dataset_path
+            text: root.data_path
+			markup: True
+
+            # SIZE INFORMATION
+            pos: 102,-153
+            font_size: 12
+			halign: "left"
+			valign: "top"
+			text_size: self.size
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+        # FULL PATH TEXT
+        Label:
+            # BASE INFORMATION
+            id: full_path
+            text: "Full Path"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+64,root.height/2-160
+            font_size: 11.5
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+        # HEATMAP BUTTON
+        ImageButton:
+            id: heatmap
+            source:'templates/heatmap.png'
+            size_hint: None, None
+            size: 20,20
+            pos: 325,root.height-71
+			on_release:
+				root.plot_type = "Heatmap"
+
+        # NODE LINK BUTTON
+        ImageButton:
+            id: nodelink
+            source:'templates/node_link.png'
+            size_hint: None, None
+            size: 20,20
+            pos: 365,root.height-71
+			on_release:
+				root.plot_type = "Node-Link Diagram"
+
+		# LENS BUTTON
+        ImageButton:
+            id: lens
+            source:'templates/lens.png'
+            size_hint: None, None
+            size: 40,40
+            pos: root.width-70,root.height-80
+
+		# LENS BUTTON
+        Button:
+			# BASE INFORMATION
+            id: lens
+			text: "[b]Code[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            size_hint: None, None
+            size: 75,25
+            pos: root.width/2,root.height-32.5
+			font_size: 11
+			padding_x: 10
+
+			color: 0.1,0.1,0.1,1
+			background_normal:"templates/window_option_gray_right.png"
+			on_release:
+                app.root.current = "code"
+
+		# LENS BUTTON
+        Button:
+			# BASE INFORMATION
+			text: "[b]Graph[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            size_hint: None, None
+            size: 75,25
+            pos: root.width/2-75,root.height-32.5
+			font_size: 11
+			padding_x: 10
+
+			color: 0.95,0.95,0.95,1
+			background_normal:"templates/window_option_dark_gray_left.png"
+
+		# LOAD FILE BUTTON
+        Button:
+			# BASE INFORMATION
+            id: load_file
+			text: ""
+
+			# SIZE INFORMATION
+            size_hint: None, None
+            size: 25,25
+            pos: 140,root.height-74
+
+			# COLOR INFORMATION
+			color: 0.5,0.5,0.5,1
+            background_normal: "templates/file_symbol.png"
+			background_down: ""
+
+			on_release:
+				root._load_data()
+
+		# # NUMBER OF PICTURES TEXT INPUT
+		# TextInput:
+		# 	# BASE INFORMATION
+		# 	id: number_of_pictures
+		#
+		# 	# SIZE INFORMATION
+        #     pos: 100, root.height-860
+        #     size: 40,20
+        #     size_hint: None, None
+		# 	font_size: 12
+		#
+		# 	# COLOR INFORMATION
+        #     color: 0.1,0.1,0.1,1
+        #     background_normal: ''
+        #     background_color: 0.97,0.97,0.97,1
+        #     background_down: ""
+
+		# # INTERVAL TEXT INPUT
+		# TextInput:
+		# 	# BASE INFORMATION
+		# 	id: interval
+		#
+		# 	# SIZE INFORMATION
+        #     pos: 100, root.height-890
+        #     size: 40,20
+        #     size_hint: None, None
+		# 	font_size: 12
+		#
+		# 	# COLOR INFORMATION
+        #     color: 0.1,0.1,0.1,1
+        #     background_normal: ''
+        #     background_color: 0.97,0.97,0.97,1
+        #     background_down: ""
+
+		# PLOT TYPE BUTTON
+        Button:
+            # BASE INFORMATION
+            id: plot_type_button
+			text: root.plot_type
+
+            # SIZE INFORMATION
+            pos: 100, root.height-281
+            size: 160,20
+            size_hint: None, None
+			halign: "left"
+			valign: "center"
+			padding_x: 10
+			font_size: 11
+			text_size: self.size
+
+            # COLOR INFORMATION
+			color: 0.1,0.1,0.1,1
+            background_normal: ''
+			background_color: 0.97,0.97,0.97,1
+			background_down: ''
+
+			on_release:
+				plot_type_dropdown.open(self)
+			on_parent:
+				plot_type_dropdown.dismiss()
+
+			DropDown:
+				id: plot_type_dropdown
+				Button:
+					text: "Heatmap"
+
+		            # SIZE INFORMATION
+		            size: 160,20
+		            size_hint: None, None
+					halign: "left"
+					valign: "center"
+					padding_x: 10
+					font_size: 11
+					text_size: self.size
+
+		            # COLOR INFORMATION
+					color: 0.1,0.1,0.1,1
+		            background_normal: ''
+					background_color: 0.97,0.97,0.97,1
+					background_down: ''
+
+					on_release:
+						root.plot_type = "Heatmap"
+
+				Button:
+					text: "Node-Link Diagram"
+
+		            # SIZE INFORMATION
+		            size: 160,20
+		            size_hint: None, None
+					halign: "left"
+					valign: "center"
+					padding_x: 10
+					font_size: 11
+					text_size: self.size
+
+		            # COLOR INFORMATION
+					color: 0.1,0.1,0.1,1
+		            background_normal: ''
+					background_color: 0.97,0.97,0.97,1
+					background_down: ''
+
+					on_release:
+						root.plot_type = "Node-Link Diagram"
+
+		Image:
+			pos: 257, root.height-281.5
+            size: 20,21
+            size_hint: None, None
+			source: "templates/dropdown_symbol.png"
+
+		# COLOR SCHEME BUTTON
+        Button:
+            # BASE INFORMATION
+            id: color_scheme
+
+            # SIZE INFORMATION
+            pos: 100, root.height-320
+            size: 175,25
+            size_hint: None, None
+
+            # COLOR INFORMATION
+            background_normal: 'templates/jet_scheme.png'
+			background_down: 'templates/jet_scheme.png'
+			on_release:
+				color_scheme_dropdown.open(self)
+			on_parent:
+				color_scheme_dropdown.dismiss()
+
+			DropDown:
+		        id: color_scheme_dropdown
+
+				Button:
+
+					# SIZE INFORMATION
+		            pos: 100, root.height-280
+		            size: 175,20
+		            size_hint: None, None
+
+		            background_normal: 'templates/viridis_scheme.png'
+		            on_release:
+						color_scheme.background_normal = 'templates/viridis_scheme.png'
+						root.color_scheme = "viridis"
+
+				Button:
+					# SIZE INFORMATION
+		            pos: 100, root.height-280
+		            size: 175,20
+		            size_hint: None, None
+
+		            background_normal: 'templates/plasma_scheme.png'
+		            #on_release: dropdown.select('First Item')
+					on_release:
+						color_scheme.background_normal = 'templates/plasma_scheme.png'
+						root.color_scheme = "plasma"
+
+				Button:
+
+					# SIZE INFORMATION
+		            pos: 100, root.height-280
+		            size: 175,20
+		            size_hint: None, None
+
+		            background_normal: 'templates/jet_scheme.png'
+		            on_release:
+						color_scheme.background_normal = 'templates/jet_scheme.png'
+						root.color_scheme = "jet"
+
+				Button:
+					# SIZE INFORMATION
+		            pos: 100, root.height-280
+		            size: 175,20
+		            size_hint: None, None
+
+		            background_normal: 'templates/terrain_scheme.png'
+		            #on_release: dropdown.select('First Item')
+					on_release:
+						color_scheme.background_normal = 'templates/terrain_scheme.png'
+						root.color_scheme = "terrain"
+
+        # PLOT BUTTON
+        Button:
+            # BASE INFORMATION
+            id: plot
+            text: "[b]PLOT[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: 70, root.height-800
+            size: 160,25
+            size_hint: None, None
+            font_size: 13
+
+            # COLOR INFORMATION
+            color: 0.95,0.95,0.95,1
+            background_normal: 'templates/blue_button.png'
+            background_down: ""
+
+            on_press:
+                root._draw_plot()
+
+		# SHOW DATA BUTTON
+        Button:
+            # BASE INFORMATION
+            id: show_data
+            text: "[b]Show Data[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: 325, root.height-590
+            size: 150,25
+            size_hint: None, None
+            font_size: 11
+
+            # COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: ''
+            background_color: 0.94,0.94,0.94,1
+            background_down: ""
+
+			on_press:
+				root.show_data()
+
+#################################
+### Temporary Heatmap Buttons ###
+#################################
+	FloatLayout:
+		id: heatmap_buttons
+		width: root.width if root.plot_type == "Heatmap" else 0
+        size_hint: (None, 1)
+        opacity: 1 if root.plot_type == "Heatmap" else 0
+
+		canvas.before:
+			# BORDER LINE OF HEATMAP FUNCTION
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Rectangle:
+                # SIZE INFORMATION
+                pos: 99.5, root.height-381.5
+                size: 161,21
+
+			# BORDER LINE OF HEATMAP FILTER OPTIONS
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Line:
+                points: 25,root.height-538, 275,root.height-538
+                width: 1
+
+			# BORDER LINE OF HEATMAP ORDERING BUTTON
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Rectangle:
+                # SIZE INFORMATION
+                pos: 99.5, root.height-416.5
+                size: 161,21
+
+		# # ADJACENCY MATRIX?
+        # Label:
+        #     # BASE INFORMATION
+        #     text: "Adjacency Matrix"
+		#
+        #     # SIZE INFORMATION
+        #     pos: -root.width/2+185,root.height/2-435
+        #     font_size: 12
+		#
+        #     # COLOR INFORMATION
+        #     color: 0.1,0.1,0.1,1
+
+		# FILTER OPTIONS TEXT
+        Label:
+            # BASE INFORMATION
+            id: graph_options
+            text: "[b]Filter Options[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: -root.width/2+52,root.height/2-560
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# AGGREGATION FUNCTION TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Function"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+62,root.height/2-370
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# ORDERING FUNCTION TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Ordering"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+62,root.height/2-405
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# COLOR FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Color"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+70,root.height/2-587
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# X FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "X Range"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+62,root.height/2-622
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# Y FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Y Range"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+62,root.height/2-657
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# FILTER FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Filter"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+70,root.height/2-692
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# HEATMAP FUNCTION BUTTON
+        Button:
+            # BASE INFORMATION
+            id: heatmap_function
+			text: root.heatmap_function
+
+            # SIZE INFORMATION
+            pos: 100, root.height-381
+            size: (160,20) if root.plot_type == "Heatmap" else (0,20)
+            size_hint: None, None
+			halign: "left"
+			valign: "center"
+			padding_x: 10
+			font_size: 11
+			text_size: self.size
+
+            # COLOR INFORMATION
+			color: 0.1,0.1,0.1,1
+            background_normal: ''
+			background_color: 0.97,0.97,0.97,1
+			background_down: ''
+			on_release:
+				heatmap_function_dropdown.open(self)
+			on_parent:
+				heatmap_function_dropdown.dismiss()
+
+			DropDown:
+				id: heatmap_function_dropdown
+				# HEATMAP SUM FUNCTION BUTTON
+		        Button:
+		            # BASE INFORMATION
+					text: "Sum"
+
+		            # SIZE INFORMATION
+		            size: 160,20
+		            size_hint: None, None
+					halign: "left"
+					valign: "center"
+					padding_x: 10
+					font_size: 11
+					text_size: self.size
+
+		            # COLOR INFORMATION
+					color: 0.1,0.1,0.1,1
+		            background_normal: ''
+					background_color: 0.97,0.97,0.97,1
+					background_down: ''
+
+		Image:
+			pos: 257, root.height-381.5
+            size: 20,21
+            size_hint: None, None
+			source: "templates/dropdown_symbol.png"
+
+
+		# PLOT TYPE BUTTON
+        Button:
+            # BASE INFORMATION
+            id: heatmap_ordering
+			text: root.heatmap_ordering
+
+            # SIZE INFORMATION
+            pos: 100, root.height-416
+            size: (160,20) if root.plot_type == "Heatmap" else (0,20)
+            size_hint: None, None
+			halign: "left"
+			valign: "center"
+			padding_x: 10
+			font_size: 11
+			text_size: self.size
+
+            # COLOR INFORMATION
+			color: 0.1,0.1,0.1,1
+            background_normal: ''
+			background_color: 0.97,0.97,0.97,1
+			background_down: ''
+
+		# DROPDOWN SYMBOL FOR HEATMAP ORDERING
+		Image:
+			pos: 257, root.height-416.5
+            size: 20,21
+            size_hint: None, None
+			source: "templates/dropdown_symbol.png"
+
+		DropDestinationButton:
+			id: which_X
+			text: "[b]X[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            pos: 325, root.height-780
+            size: (70,60) if root.plot_type == "Heatmap" else (0,60)
+            size_hint: None, None
+			halign: "center"
+			valign: "bottom"
+			padding_y: 5
+			font_size: 11
+			text_size: self.size
+
+			# COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: 'templates/drop_button.png'
+
+			drop_func: root.which_x_update
+			on_release: root.x_column = ""
+
+		Label:
+			text: root.x_column
+			pos: 311, root.height-738
+			halign: "center"
+			valign: "bottom"
+            size_hint: None, None
+			font_size: 10
+			text_size: self.size
+			color: 0.1,0.1,0.1,1
+
+		DropDestinationButton:
+			id: which_Y
+			text: "[b]Y[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            pos: 405, root.height-780
+            size: (70,60) if root.plot_type == "Heatmap" else (0,60)
+            size_hint: None, None
+			halign: "center"
+			valign: "bottom"
+			padding_y: 5
+			font_size: 11
+			text_size: self.size
+
+			# COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: 'templates/drop_button.png'
+
+			drop_func: root.which_y_update
+			on_release: root.y_column = ""
+
+		Label:
+			text: root.y_column
+			pos: 391, root.height-738
+			halign: "center"
+			valign: "bottom"
+            size_hint: None, None
+			font_size: 10
+			text_size: self.size
+			color: 0.1,0.1,0.1,1
+
+		# COLOR SLIDER
+		CustomSlider:
+			pos: 100,root.height-600
+			size: (170,20) if root.plot_type == "Heatmap" else (0,20)
+			size_hint: None, None
+
+		# X RANGE SLIDER
+		CustomSlider:
+			pos: 100,root.height-635
+			size: (170,20) if root.plot_type == "Heatmap" else (0,20)
+			size_hint: None, None
+
+		# Y RANGE SLIDER
+		CustomSlider:
+			pos: 100,root.height-670
+			size: (170,20) if root.plot_type == "Heatmap" else (0,20)
+			size_hint: None, None
+
+		# FILTER SLIDER
+		CustomSlider:
+			pos: 100,root.height-705
+			size: (170,20) if root.plot_type == "Heatmap" else (0,20)
+			size_hint: None, None
+
+###################################
+### Temporary Node-Link Buttons ###
+###################################
+	FloatLayout:
+		id: node_link_buttons
+		width: root.width if root.plot_type == "Node-Link Diagram" else 0
+        size_hint: (None, 1)
+        opacity: 1 if root.plot_type == "Node-Link Diagram" else 0
+
+		canvas.before:
+			# BORDER LINE OF HEATMAP FUNCTION
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Rectangle:
+                # SIZE INFORMATION
+                pos: 99.5, root.height-381.5
+                size: 161,21
+
+			# BORDER LINE OF NODE LINK FILTERS
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Line:
+                points: 25,root.height-538, 275,root.height-538
+                width: 1
+
+			# BORDER LINE OF HIGHLIGHT BUTTON
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Rectangle:
+                # SIZE INFORMATION
+                pos: 99.5, root.height-416.5
+                size: 161,21
+
+			# BORDER LINE OF START NODE
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Rectangle:
+                # SIZE INFORMATION
+                pos: 99.5, root.height-451.5
+                size: 61,21
+
+			# BORDER LINE OF END NODE
+            Color:
+                rgba: 0.7,0.7,0.7,1
+            Rectangle:
+                # SIZE INFORMATION
+                pos: 209.5, root.height-451.5
+                size: 61,21
+
+		# COLOR SLIDER
+		CustomSlider:
+			pos: 100,root.height-600
+			size: (170,20) if root.plot_type == "Node-Link Diagram" else (0,20)
+			size_hint: None, None
+
+		# X RANGE SLIDER
+		CustomSlider:
+			pos: 100,root.height-635
+			size: (170,20) if root.plot_type == "Node-Link Diagram" else (0,20)
+			size_hint: None, None
+
+		# Y RANGE SLIDER
+		CustomSlider:
+			pos: 100,root.height-670
+			size: (170,20) if root.plot_type == "Node-Link Diagram" else (0,20)
+			size_hint: None, None
+
+		# FILTER SLIDER
+		CustomSlider:
+			pos: 100,root.height-705
+			size: (170,20) if root.plot_type == "Node-Link Diagram" else (0,20)
+			size_hint: None, None
+
+		# COLOR FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Color"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+70,root.height/2-587
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# NODE FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Nodes"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+65,root.height/2-622
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# Y FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Edges"
+			markup: True
+
+            # SIZE INFORMATION
+            pos: -root.width/2+65,root.height/2-657
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# FILTER FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Filter"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+70,root.height/2-692
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# FILTER OPTIONS TEXT
+        Label:
+            # BASE INFORMATION
+            id: graph_options
+            text: "[b]Filter Options[/b]"
+            markup: True
+
+            # SIZE INFORMATION
+            pos: -root.width/2+52,root.height/2-560
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		DropDestinationButton:
+			id: which_start_node
+			text: "[b]Start[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            pos: 325, root.height-780
+            size: (70,60) if root.plot_type == "Node-Link Diagram" else (0,60)
+            size_hint: None, None
+			halign: "center"
+			valign: "bottom"
+			padding_y: 5
+			font_size: 11
+			text_size: self.size
+
+			# COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: 'templates/drop_button.png'
+
+			drop_func: root.which_start_node_update
+			on_release: root.start_node_column = ""
+
+		Label:
+			text: root.start_node_column
+			pos: 311, root.height-738
+			halign: "center"
+			valign: "bottom"
+            size_hint: None, None
+			font_size: 10
+			text_size: self.size
+			color: 0.1,0.1,0.1,1
+
+		# LAYOUT TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Layout"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+65,root.height/2-370
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# HEATMAP FUNCTION BUTTON
+        Button:
+            # BASE INFORMATION
+            id: node_link_layout
+			text: root.node_link_layout
+
+            # SIZE INFORMATION
+            pos: 100, root.height-381
+            size: (160,20) if root.plot_type == "Node-Link Diagram" else (0,20)
+            size_hint: None, None
+			halign: "left"
+			valign: "center"
+			padding_x: 10
+			font_size: 11
+			text_size: self.size
+
+            # COLOR INFORMATION
+			color: 0.1,0.1,0.1,1
+            background_normal: ''
+			background_color: 0.97,0.97,0.97,1
+			background_down: ''
+
+		Image:
+			pos: 257, root.height-381.5
+            size: 20,21
+            size_hint: None, None
+			source: "templates/dropdown_symbol.png"
+
+		DropDestinationButton:
+			id: which_end_node
+			text: "[b]End[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            pos: 405, root.height-780
+            size: (70,60) if root.plot_type == "Node-Link Diagram" else (0,60)
+            size_hint: None, None
+			halign: "center"
+			valign: "bottom"
+			padding_y: 5
+			font_size: 11
+			text_size: self.size
+
+			# COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: 'templates/drop_button.png'
+
+			drop_func: root.which_end_node_update
+			on_release: root.end_node_column = ""
+
+		Label:
+			text: root.end_node_column
+			pos: 391, root.height-738
+			halign: "center"
+			valign: "bottom"
+            size_hint: None, None
+			font_size: 10
+			text_size: self.size
+			color: 0.1,0.1,0.1,1
+
+		DropDestinationButton:
+			id: which_size
+			text: "[b]Size[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            pos: 405, root.height-850
+            size: (70,60) if root.plot_type == "Node-Link Diagram" else (0,60)
+            size_hint: None, None
+			halign: "center"
+			valign: "bottom"
+			padding_y: 5
+			font_size: 11
+			text_size: self.size
+
+			# COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: 'templates/drop_button.png'
+
+			drop_func: root.which_size_update
+			on_release: root.size_column = ""
+
+		Label:
+			text: root.size_column
+			pos: 391, root.height-808
+			halign: "center"
+			valign: "bottom"
+            size_hint: None, None
+			font_size: 10
+			text_size: self.size
+			color: 0.1,0.1,0.1,1
+
+		DropDestinationButton:
+			id: which_edges
+			text: "[b]Edge[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            pos: 325, root.height-850
+            size: (70,60) if root.plot_type == "Node-Link Diagram" else (0,60)
+            size_hint: None, None
+			halign: "center"
+			valign: "bottom"
+			padding_y: 5
+			font_size: 11
+			text_size: self.size
+
+			# COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: 'templates/drop_button.png'
+
+			drop_func: root.which_edge_update
+			on_release: root.edge_column = ""
+
+		Label:
+			text: root.edge_column
+			pos: 311, root.height-808
+			halign: "center"
+			valign: "bottom"
+            size_hint: None, None
+			font_size: 10
+			text_size: self.size
+			color: 0.1,0.1,0.1,1
+
+		# PLOT TYPE BUTTON
+        Button:
+            # BASE INFORMATION
+            id: node_link_highlight
+			text: root.node_link_highlight
+
+            # SIZE INFORMATION
+            pos: 100, root.height-416
+            size: (160,20) if root.plot_type == "Node-Link Diagram" else (0,20)
+            size_hint: None, None
+			halign: "left"
+			valign: "center"
+			padding_x: 10
+			font_size: 11
+			text_size: self.size
+
+            # COLOR INFORMATION
+			color: 0.1,0.1,0.1,1
+            background_normal: ''
+			background_color: 0.97,0.97,0.97,1
+			background_down: ''
+
+		# FROM (START) NODE
+		TextInput:
+			# SIZE INFORMATION
+            pos: 100, root.height-451
+            size: (60,20) if root.plot_type == "Node-Link Diagram" else (0,20)
+            size_hint: None, None
+			halign: "left"
+			valign: "center"
+			padding_x: 10
+			font_size: 11
+			text_size: self.size
+
+            # COLOR INFORMATION
+			color: 0.1,0.1,0.1,1
+            background_normal: ''
+			background_color: 0.97,0.97,0.97,1
+			background_down: ''
+
+		# TO (END) NODE
+		TextInput:
+			# SIZE INFORMATION
+            pos: 210, root.height-451
+            size: (60,20) if root.plot_type == "Node-Link Diagram" else (0,20)
+            size_hint: None, None
+			halign: "left"
+			valign: "center"
+			padding_x: 10
+			font_size: 11
+			text_size: self.size
+
+            # COLOR INFORMATION
+			color: 0.1,0.1,0.1,1
+            background_normal: ''
+			background_color: 0.97,0.97,0.97,1
+			background_down: ''
+
+		Image:
+			pos: 257, root.height-416.5
+            size: 20,21
+            size_hint: None, None
+			source: "templates/dropdown_symbol.png"
+
+		# HIGHLIGHT TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Algorithm"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+57,root.height/2-405
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# START NODE TEXT
+        Label:
+            # BASE INFORMATION
+            text: "From"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+70,root.height/2-440
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# END NODE TEXT
+        Label:
+            # BASE INFORMATION
+            text: "To"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+192,root.height/2-440
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# NODE LINK COLORING TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Coloring"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+61,root.height/2-482
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# LABELS FOR NODE LINK?
+        Label:
+            # BASE INFORMATION
+            text: "Show Labels"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+172,root.height/2-517
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# LENS BUTTON
+		Button:
+			# BASE INFORMATION
+			text: "Nodes"
+			markup: True
+
+			# SIZE INFORMATION
+			size_hint: None, None
+			size: 65,20
+			pos: 120,root.height-495
+			font_size: 10
+
+			color: 0.1,0.1,0.1,1
+			background_normal:"templates/window_option_white_left.png"
+
+		# LENS BUTTON
+		Button:
+			# BASE INFORMATION
+			text: "[b]Edges[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+			size_hint: None, None
+			size: 65,20
+			pos: 185,root.height-495
+			font_size: 10
+
+			color: 0.95,0.95,0.95,1
+			background_normal:"templates/window_option_blue_right.png"
+
+#########################
+### Screen for Coding ###
+#########################
+<CodeScreen>:
+	canvas.before:
+        Color:
+            rgba: 0.97,0.97,0.97,1
+        Rectangle:
+            pos: 0,0
+            size: root.width, root.height
+
+		# BORDER LINE OF OPTIONS-BAR
+		Color:
+			rgba: 0.7,0.7,0.7,1
+		Line:
+			points: 300,0,300,root.height-40
+			width: 1
+
+		# SHOW DATA BACKGROUND
+		Color:
+			rgba: 0.7,0.7,0.7,1
+		Rectangle:
+			pos: 74.5,root.height-590.5
+			size: 151,26
+
+		# TAB BAR BACKGROUND
+		Color:
+			rgba: 0.9,0.9,0.9,0.5
+		Rectangle:
+			pos: 0,root.height-40
+			size: root.width,40
+			source: "templates/gray_gradient.png"
+		Rectangle:
+			pos: 0,root.height-40
+			size: root.width,40
+
+	# LENS BUTTON
+	Button:
+		# BASE INFORMATION
+		text: "[b]Code[/b]"
+		markup: True
+
+		# SIZE INFORMATION
+		size_hint: None, None
+		size: 75,25
+		pos: root.width/2,root.height-32.5
+		font_size: 11
+		padding_x: 10
+
+		color: 0.95,0.95,0.95,1
+		background_normal:"templates/window_option_dark_gray_right.png"
+
+	# LENS BUTTON
+	Button:
+		# BASE INFORMATION
+		text: "[b]Graph[/b]"
+		markup: True
+
+		# SIZE INFORMATION
+		size_hint: None, None
+		size: 75,25
+		pos: root.width/2-75,root.height-32.5
+		font_size: 11
+		padding_x: 10
+
+		color: 0.1,0.1,0.1,1
+		background_normal:"templates/window_option_gray_left.png"
+		on_release:
+			app.root.current = "main"
+
+	CodeInput:
+		id: code_input
+		text: "# Place Code here ..."
+		pos: 300,0
+		size: root.width-300,root.height-40.5
+		size_hint: None,None
+		font_size: 10
+
+		background_normal: ""
+		background_color: 1,1,1,1
+
+	# SHOW DATA BUTTON
+	Button:
+		# BASE INFORMATION
+		id: show_data
+		text: "[b]Show Data[/b]"
+		markup: True
+
+		# SIZE INFORMATION
+		pos: 75, root.height-590
+		size: 150,25
+		size_hint: None, None
+		font_size: 11
+
+		# COLOR INFORMATION
+		color: 0.2,0.2,0.2,1
+		background_normal: ''
+		background_color: 0.92,0.92,0.92,1
+		background_down: ""
+
+		on_press:
+			root.show_data()
+
+	# EXECUTE CODE BUTTON
+	Button:
+		# BASE INFORMATION
+		id: execute_code_button
+		text: "[b]EXECUTE[/b]"
+		markup: True
+
+		# SIZE INFORMATION
+		pos: 70, root.height-740
+		size: 160,25
+		size_hint: None, None
+		font_size: 13
+
+		# COLOR INFORMATION
+		color: 0.95,0.95,0.95,1
+		background_normal: 'templates/blue_button.png'
+		background_down: ""
+
+		on_press:
+			root.execute_code(code_input.text)
+
+
+###############################################################################
+# OTHER OBJECTS
+###############################################################################
+<DraggableButton>:
+	size: (150,20)
+	size_hint: (None,None)
+	font_size: 11
+	halign: "left"
+	valign: "center"
+	text_size: self.size
+	color: (0.2,0.2,0.2,1)
+	background_normal: ''
+	drop_ok_do_animation: False
