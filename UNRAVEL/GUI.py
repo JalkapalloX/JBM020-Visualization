@@ -28,6 +28,7 @@ from kivy.uix.codeinput import CodeInput
 from kivy.uix.slider import Slider
 from kivydnd.dragndropwidget import DragNDropWidget # https://github.com/GreyGnome/KivyDnD
 from kivydnd.dropdestination import DropDestination
+import slider
 
 # LAYOUTS
 from kivy.uix.floatlayout import FloatLayout
@@ -44,10 +45,6 @@ import matplotlib.pyplot as plt
 # GLOBAL VARIABLES
 G_DATA = []
 
-class ErrorButton(Button):
-    def __init__(self, **kw):
-        super(ErrorButton, self).__init__(**kw)
-
 class DraggableButton(Button, DragNDropWidget):
     def __init__(self, column, origin, **kw):
         self.column = column
@@ -57,20 +54,6 @@ class DraggableButton(Button, DragNDropWidget):
 class DropDestinationButton(Button, DropDestination):
     def __init__(self, **kw):
         super(DropDestinationButton, self).__init__(**kw)
-
-class CustomSlider(Slider):
-    # @OVERRIDE
-    # CHANGE CURSOR TO SMALL BLUE DOT
-    cursor_image = StringProperty("templates/white_dot.png")
-    cursor_width = NumericProperty('10sp')
-    cursor_height = NumericProperty('10sp')
-    cursor_size = ReferenceListProperty(cursor_width, cursor_height)
-
-    # LET BACKGROUND BE SMALLER
-    background_width = NumericProperty('26sp')
-    value_track = BooleanProperty(True)
-    value_track_color = ListProperty([0.5, 0.5, 1, 1])
-    value_track_width = NumericProperty('2dp')
 
 class ImageButton(ButtonBehavior, Image):
     pass
@@ -92,8 +75,8 @@ class MainScreen(Screen):
     data_path = StringProperty("[b]None[/b]")             # Full path to data set
 
     # PLOT GENERAL
-    plot_type = StringProperty("Heatmap")                 # Type of plot
-    color_scheme = StringProperty("jet")   # Color scheme of plot
+    plot_type = StringProperty("Node-Link Diagram")                 # Type of plot
+    color_scheme = StringProperty("viridis")   # Color scheme of plot
 
     color_column = StringProperty("")
     filter_column = StringProperty("")
@@ -108,36 +91,66 @@ class MainScreen(Screen):
     # NODE LINK properties
     node_link_layout = StringProperty("Fruchterman-Reingold")
     node_link_highlight = StringProperty("None")
+    node_link_color_nodes = BooleanProperty(True)
+    node_link_color_edges = BooleanProperty(True)
     start_node_column = StringProperty("")
     end_node_column = StringProperty("")
     edge_column = StringProperty("")
     size_column = StringProperty("")
+
+    # SLIDER PROPERTIES
+    color_slider_max = NumericProperty(0)
+    color_slider_min = NumericProperty(0)
+    filter_slider_max = NumericProperty(0)
+    filter_slider_min = NumericProperty(0)
+    x_range_slider_max = NumericProperty(0)
+    x_range_slider_min = NumericProperty(0)
+    y_range_slider_max = NumericProperty(0)
+    y_range_slider_min = NumericProperty(0)
+    node_slider_max = NumericProperty(0)
+    node_slider_min = NumericProperty(0)
+    edge_slider_max = NumericProperty(0)
+    edge_slider_min = NumericProperty(0)
 
     # WHEN 'PLOT' IS PRESSED
     def _draw_plot(self):
         #try:
         utilities.wipe("graphs/")                     # Cleans directory
         if self.plot_type == "Heatmap":
+            # subset = utilities.data_filter(G_DATA, self.plot_type,
+            #                                (self.color_column, self.x_column, self.y_column, self.filter_column),
+            #                                (self.color_slider_min, self.color_slider_max,
+            #                                 self.x_range_slider_min, self.x_range_slider_max,
+            #                                 self.y_range_slider_min, self.y_range_slider_max,
+            #                                 self.filter_slider_min, self.filter_slider_max))
+
             plots.create_static_plot(self.plot_type,
                                      df = G_DATA,
                                      X = self.x_column,
                                      Y = self.y_column,
                                      values = self.color_column,
-                                     aggfunc = np.sum,
+                                     aggfunc = self.heatmap_function,
+                                     ordering=self.heatmap_ordering,
                                      cmap=self.color_scheme)
         elif self.plot_type == "Node-Link Diagram":
+            if self.node_link_highlight == "Dijkstra":
+                dist, highlight = utilities.dijkstra(G_DATA, self.start_node_column, self.end_node_column, self.edge_column, int(self.ids.from_node.text), int(self.ids.to_node.text))
+            else:
+                highlight=[]
+
             plots.create_static_plot(self.plot_type,
                                      df = G_DATA,
                                      start_node = self.start_node_column,
                                      end_node = self.end_node_column,
                                      layout=self.node_link_layout,
                                      directed=False,
-                                     edge_weight="None",
+                                     edge_weight=self.edge_column,
                                      node_size=self.size_column,
                                      color=self.color_column,
-                                     color_nodes=True,
+                                     color_nodes=self.node_link_color_nodes,
+                                     color_edges=self.node_link_color_edges,
                                      cmap=self.color_scheme,
-                                     with_labels=False)
+                                     highlight=highlight)
         self.plot_img = "graphs/" + os.listdir("graphs/")[0]
         # except:
         #     print("Error")
@@ -185,22 +198,31 @@ class MainScreen(Screen):
                                       droppable_zone_objects=[self.ids.which_color, self.ids.which_filter,
                                                               self.ids.which_X, self.ids.which_Y,
                                                               self.ids.which_start_node, self.ids.which_end_node,
-                                                              self.ids.which_edges, self.ids.whole_screen],
+                                                              self.ids.which_edges, self.ids.which_size,
+                                                              self.ids.whole_screen],
                                       column=DroppedObject.column,
                                       origin=DroppedObject.origin)
         self.add_widget(drag_button)
 
     def which_color_update(self, DroppedObject):
         self.color_column=DroppedObject.column
+        self.color_slider_max=max(G_DATA[DroppedObject.column])
+        self.color_slider_min=min(G_DATA[DroppedObject.column])
 
     def which_filter_update(self, DroppedObject):
         self.filter_column=DroppedObject.column
+        self.filter_slider_max=max(G_DATA[DroppedObject.column])
+        self.filter_slider_min=min(G_DATA[DroppedObject.column])
 
     def which_x_update(self, DroppedObject):
         self.x_column=DroppedObject.column
+        self.x_range_slider_max=max(G_DATA[DroppedObject.column])
+        self.x_range_slider_min=min(G_DATA[DroppedObject.column])
 
     def which_y_update(self, DroppedObject):
         self.y_column=DroppedObject.column
+        self.y_range_slider_max=max(G_DATA[DroppedObject.column])
+        self.y_range_slider_min=min(G_DATA[DroppedObject.column])
 
     def which_start_node_update(self, DroppedObject):
         self.start_node_column=DroppedObject.column
@@ -210,9 +232,13 @@ class MainScreen(Screen):
 
     def which_edge_update(self, DroppedObject):
         self.edge_column=DroppedObject.column
+        self.edge_slider_max=max(G_DATA[DroppedObject.column])
+        self.edge_slider_min=min(G_DATA[DroppedObject.column])
 
     def which_size_update(self, DroppedObject):
         self.size_column=DroppedObject.column
+        self.node_slider_max=max(G_DATA[DroppedObject.column])
+        self.node_slider_min=min(G_DATA[DroppedObject.column])
 
     def show_data(self):
         dfgui.show(G_DATA)
