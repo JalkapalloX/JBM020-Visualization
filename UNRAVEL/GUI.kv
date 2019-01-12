@@ -19,6 +19,18 @@ ScreenManagement:
 	heatmap_function_dropdown: heatmap_function_dropdown.__self__
 	heatmap_ordering_dropdown: heatmap_ordering_dropdown.__self__
 	node_link_layout_dropdown: node_link_layout_dropdown.__self__
+	node_link_highlight_dropdown: node_link_highlight_dropdown.__self__
+
+	FloatLayout:
+		Zoom:
+			id: my_zoom
+			Image:
+				source: root.plot_img
+				size: (root.width-501,root.height-82) if root.modus == "Detail" else (0,0)
+				pos: 501, 0
+				size_hint: None, None
+				allow_stretch: True
+		    	keep_ratio: True
 
     FloatLayout:
 		id: whole_screen
@@ -27,14 +39,8 @@ ScreenManagement:
             Color:
                 rgba: 0.97,0.97,0.97,1
             Rectangle:
-                pos: 0,0
+                pos: 0,root.height-80
                 size: root.width,root.height
-
-			Color:
-                rgba: 1,1,1,1
-            Rectangle:
-                pos: 300,0
-                size: root.width-250,root.height-80
 
             # OPTIONS BAR BACKGROUND
             Color:
@@ -131,7 +137,7 @@ ScreenManagement:
         ImageButton:
             id: plot
             source: root.plot_img
-            size: root.width-501,root.height-82
+            size: root.width-501,root.height-82 if root.modus == "Plot" else (0,0)
             size_hint: None,None
             pos: 501, 0
 
@@ -382,6 +388,8 @@ ScreenManagement:
             size_hint: None, None
             size: 40,40
             pos: root.width-70,root.height-80
+			on_press:
+				root._change_modus()
 
 		# LENS BUTTON
         Button:
@@ -436,40 +444,6 @@ ScreenManagement:
 
 			on_release:
 				root._load_data()
-
-		# # NUMBER OF PICTURES TEXT INPUT
-		# TextInput:
-		# 	# BASE INFORMATION
-		# 	id: number_of_pictures
-		#
-		# 	# SIZE INFORMATION
-        #     pos: 100, root.height-860
-        #     size: 40,20
-        #     size_hint: None, None
-		# 	font_size: 12
-		#
-		# 	# COLOR INFORMATION
-        #     color: 0.1,0.1,0.1,1
-        #     background_normal: ''
-        #     background_color: 0.97,0.97,0.97,1
-        #     background_down: ""
-
-		# # INTERVAL TEXT INPUT
-		# TextInput:
-		# 	# BASE INFORMATION
-		# 	id: interval
-		#
-		# 	# SIZE INFORMATION
-        #     pos: 100, root.height-890
-        #     size: 40,20
-        #     size_hint: None, None
-		# 	font_size: 12
-		#
-		# 	# COLOR INFORMATION
-        #     color: 0.1,0.1,0.1,1
-        #     background_normal: ''
-        #     background_color: 0.97,0.97,0.97,1
-        #     background_down: ""
 
 		# PLOT TYPE BUTTON
         Button:
@@ -1858,6 +1832,54 @@ ScreenManagement:
             # COLOR INFORMATION
             color: 0.1,0.1,0.1,1
 
+		# COLOR FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Color"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+70,root.height/2-587
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# X FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Nodes"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+65,root.height/2-622
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# Y FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Edges"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+65,root.height/2-657
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
+		# FILTER FILTER TEXT
+        Label:
+            # BASE INFORMATION
+            text: "Filter"
+
+            # SIZE INFORMATION
+            pos: -root.width/2+70,root.height/2-692
+            font_size: 12
+
+            # COLOR INFORMATION
+            color: 0.1,0.1,0.1,1
+
 		DropDestinationButton:
 			id: which_start_node_in
 			text: "[b]Start[/b]"
@@ -1957,6 +1979,38 @@ ScreenManagement:
 			text_size: self.size
 			color: 0.1,0.1,0.1,1
 
+		DropDestinationButton:
+			id: which_time
+			text: "[b]Time[/b]"
+			markup: True
+
+			# SIZE INFORMATION
+            pos: 405, root.height-850
+            size: (70,60) if root.plot_type == "Interleaved Network" else (0,60)
+            size_hint: None, None
+			halign: "center"
+			valign: "bottom"
+			padding_y: 5
+			font_size: 11
+			text_size: self.size
+
+			# COLOR INFORMATION
+            color: 0.2,0.2,0.2,1
+            background_normal: 'templates/drop_button.png'
+
+			drop_func: root.which_time_update
+			on_release: root.time_column = ""
+
+		Label:
+			text: root.time_column
+			pos: 391, root.height-808
+			halign: "center"
+			valign: "bottom"
+            size_hint: None, None
+			font_size: 10
+			text_size: self.size
+			color: 0.1,0.1,0.1,1
+
 		# COLOR SLIDER
 		RangeSlider:
 			id: interleaved_network_color_slider
@@ -1968,7 +2022,7 @@ ScreenManagement:
 
 		# COLOR SLIDER MIN
 		Label:
-			text: str(int(interleaved_network_color_slider.value[0]/100 * root.color_slider_min))
+			text: str(int(interleaved_network_color_slider.value[0]/100 * root.color_slider_max + root.color_slider_min))
 
 			# SIZE INFORMATION
             pos: -root.width/2+116,root.height/2-605
@@ -1979,7 +2033,7 @@ ScreenManagement:
 
 		# COLOR SLIDER MAX
 		Label:
-			text: str(int(interleaved_network_color_slider.value[1]/100 * root.color_slider_max))
+			text: str(int(interleaved_network_color_slider.value[1]/100 * root.color_slider_max + root.color_slider_min))
 
 			# SIZE INFORMATION
             pos: -root.width/2+254,root.height/2-605
@@ -1998,7 +2052,7 @@ ScreenManagement:
 
 		# NODE SLIDER MIN
 		Label:
-			text: str(int(interleaved_network_node_slider.value[0]/100 * root.node_slider_min))
+			text: str(int(interleaved_network_node_slider.value[0]/100 * root.node_slider_max + root.node_slider_min))
 
 			# SIZE INFORMATION
             pos: -root.width/2+116,root.height/2-640
@@ -2009,7 +2063,7 @@ ScreenManagement:
 
 		# COLOR SLIDER MAX
 		Label:
-			text: str(int(interleaved_network_node_slider.value[1]/100 * root.node_slider_max))
+			text: str(int(interleaved_network_node_slider.value[1]/100 * root.node_slider_max + root.node_slider_min))
 
 			# SIZE INFORMATION
             pos: -root.width/2+254,root.height/2-640
@@ -2028,7 +2082,7 @@ ScreenManagement:
 
 		# EDGE SLIDER MIN
 		Label:
-			text: str(int(interleaved_network_edge_slider.value[0]/100 * root.edge_slider_min))
+			text: str(int(interleaved_network_edge_slider.value[0]/100 * root.edge_slider_max + root.edge_slider_min))
 
 			# SIZE INFORMATION
             pos: -root.width/2+116,root.height/2-675
@@ -2039,7 +2093,7 @@ ScreenManagement:
 
 		# EDGE SLIDER MAX
 		Label:
-			text: str(int(interleaved_network_edge_slider.value[1]/100 * root.edge_slider_max))
+			text: str(int(interleaved_network_edge_slider.value[1]/100 * root.edge_slider_max + root.edge_slider_min))
 
 			# SIZE INFORMATION
             pos: -root.width/2+254,root.height/2-675
@@ -2058,7 +2112,7 @@ ScreenManagement:
 
 		# FILTER SLIDER MIN
 		Label:
-			text: str(int(interleaved_network_filter_slider.value[0]/100 * root.filter_slider_min))
+			text: str(int(interleaved_network_filter_slider.value[0]/100 * root.filter_slider_max + root.filter_slider_min))
 
 			# SIZE INFORMATION
             pos: -root.width/2+116,root.height/2-710
@@ -2069,7 +2123,7 @@ ScreenManagement:
 
 		# FILTER SLIDER MAX
 		Label:
-			text: str(int(interleaved_network_filter_slider.value[1]/100 * root.filter_slider_max))
+			text: str(int(interleaved_network_filter_slider.value[1]/100 * root.filter_slider_max + root.filter_slider_min))
 
 			# SIZE INFORMATION
             pos: -root.width/2+254,root.height/2-710

@@ -6,12 +6,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 import networkx as nx
+import matplotlib.cm as cm
+from matplotlib.colors import Normalize
+from matplotlib.figure import Figure
 
 def create_static_plot(plot_type, df, **kwargs):
     if plot_type == "Heatmap":
         static_heatmap("graphs/", df, **kwargs)
     elif plot_type == "Node-Link Diagram":
         static_node_link("graphs/", df, **kwargs)
+    else:
+        interleaved_network("graphs/", data=df, **kwargs)
 
 def generate_matrix_reorderd(pivot_table):
     """
@@ -61,7 +66,7 @@ def static_heatmap(path, df, X, Y, values="", aggfunc="Sum", ordering="Default",
         values = "#@frequency_column"
 
     # CALCULATES TABLE AND PLOTS IT AS HEATMAP
-    table = pd.crosstab(df[X], df[Y], values=df[values], aggfunc=aggfunc)
+    table = pd.crosstab(df[Y], df[X], values=df[values], aggfunc=aggfunc)
 
     if ordering == "Dendrogram":
         row_order, column_order = get_hierachical_order(table)
@@ -133,7 +138,6 @@ def static_node_link(path, df, start_node, end_node, layout,
         node_colors = list(0.9 - node_colors / max(node_colors) + 0.1)
     else:
         node_colors = [0.1] * len(all_nodes)
-    print(node_colors[0:6])
 
 
      # GET NORMALIZED NODE SIZES
@@ -157,7 +161,7 @@ def static_node_link(path, df, start_node, end_node, layout,
 
     # GET EDGE COLORS
     if color_edges == True:
-        colors = list(1 - weights / max(weights))
+        colors = list(1-weights / max(weights))
     else:
         colors = "dimgray"
     if edge_weight == "":
@@ -171,7 +175,7 @@ def static_node_link(path, df, start_node, end_node, layout,
 
     # k=4*...
     # GET POSITIONS OF NODES
-    pos_layout_dict = {"Fruchterman-Reingold": (nx.spring_layout(G, k=7*1/np.sqrt(len(G.nodes())), weight=1)),
+    pos_layout_dict = {"Fruchterman-Reingold": (nx.spring_layout(G, k=10*1/np.sqrt(len(G.nodes())), weight=1, iterations=350)),
                        "Circular": (nx.circular_layout(G))}
     pos = pos_layout_dict[layout]
 
@@ -180,10 +184,62 @@ def static_node_link(path, df, start_node, end_node, layout,
                            edgelist=G.edges(),
                            width=weights,
                            edge_color=colors,
-                           cmap=cmap_dict[cmap], edge_vmax=1, edge_vmin=0)
+                           edge_cmap=cmap_dict[cmap],
+                           vmax=1, vmin=0)
     nx.draw_networkx_nodes(G, pos=pos,
                            node_list=all_nodes, node_size=node_sizes,
                            node_color=node_colors,
                            cmap=cmap_dict[cmap], vmax=1, vmin=0, with_labels=False)
 
     plt.savefig(path + str(int(time.time())) + ".png")
+
+def interleaved_network(path, data, start_node, end_node , edge_weight, time, colormap):
+    """
+    ~~~ ARGS ~~~
+    path         str           folder to store images in
+    data         pd.DataFrame  Data Frame object
+    start_node   str           Name of column for start node (U)
+    end_node     str           Name of column for end node (V)
+    edge_weight  str           Column for associated weights
+    time         str           Column for associated time stamps
+    color_map    str           Color map to be used. Defaults to "Oranges_r"
+    **kwargs     -             Additional arguments to be passed into ...
+    Received some help from Jaap while builidng this func.
+    """
+    df = data.copy()
+
+    # Get the infromation needed about the data
+    df['freq'] = df.groupby([time, start_node, end_node])[edge_weight].transform('count')
+    unique_stamps = df[time].unique()
+    agg = {}
+
+    # Intialising the plotting variables
+    ax = plt.figure(figsize=(14.79,9.74), dpi=100)
+    fig = ax.add_subplot(111)
+
+    fig.axis('off') # gets rid of the border
+    fig.get_xaxis().set_visible(False) # turns of the x axis
+    #fig.get_yaxis().set_visible(False) # turns of the x axis
+
+    offset = 3
+    acc = 0
+
+    # Creates dict for the  location of lines
+    while acc < len(unique_stamps):
+        try:
+            agg[unique_stamps[acc]] = unique_stamps[acc + offset]
+        except:
+            agg[unique_stamps[acc]] = 'agg+' + str(acc + offset - len(unique_stamps))
+        acc += 1
+
+    norm = Normalize(vmin=df[edge_weight].min(), vmax=df[edge_weight].max())
+    cmap = cm.get_cmap(name=colormap)
+    mapping= cm.ScalarMappable(norm=norm, cmap=cmap)
+
+    # Put the rows on the plot
+    for index, instance in df.iterrows():
+        a = [instance[time], agg[instance[time]]]
+        b = [instance[start_node], instance[end_node]]
+        fig.plot(a, b, alpha=0.25, c = mapping.to_rgba(instance[edge_weight]))
+
+    plt.savefig(path + "hey.png")

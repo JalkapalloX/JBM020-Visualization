@@ -2,36 +2,27 @@ from __future__ import print_function
 
 # OTHER
 import os
-import time
 import copy
 import utilities
 import plots
-import gc
 
 # KIVY BASE CAPABILITIES
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.core.window import Window
-from kivy.config import Config
 
 # WIDGETS
-from kivy.uix.label import Label
-from kivy.uix.dropdown import DropDown
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
-from kivy.properties import StringProperty, NumericProperty, ReferenceListProperty, BooleanProperty, ListProperty
-from kivy.clock import Clock
+from kivy.properties import StringProperty, NumericProperty, BooleanProperty
 from kivy.uix.button import Button
-from kivy.uix.switch import Switch
-from kivy.uix.codeinput import CodeInput
-from kivy.uix.slider import Slider
 from kivydnd.dragndropwidget import DragNDropWidget # https://github.com/GreyGnome/KivyDnD
 from kivydnd.dropdestination import DropDestination
 import slider
+import zoom
 
 # LAYOUTS
-from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 
 # DATA ANALYTICS LIBRARY
@@ -44,6 +35,7 @@ import matplotlib.pyplot as plt
 
 # GLOBAL VARIABLES
 G_DATA = []
+
 
 class DraggableButton(Button, DragNDropWidget):
     def __init__(self, column, origin, **kw):
@@ -68,6 +60,7 @@ class CodeScreen(Screen):
 class MainScreen(Screen):
     # DYNAMIC VARIABLES
     # GENERAL
+    modus = StringProperty("Plot")
     plot_img = StringProperty('templates/lilac_brested_roller.png') # Image to be shown
 
     # DATA
@@ -88,7 +81,7 @@ class MainScreen(Screen):
     x_column = StringProperty("")
     y_column = StringProperty("")
 
-    # NODE LINK properties
+    # NODE LINK PROPERTIES
     node_link_layout = StringProperty("Fruchterman-Reingold")
     node_link_highlight = StringProperty("None")
     node_link_color_nodes = BooleanProperty(True)
@@ -97,6 +90,9 @@ class MainScreen(Screen):
     end_node_column = StringProperty("")
     edge_column = StringProperty("")
     size_column = StringProperty("")
+
+    # INTERLEAVED NETWORK PROPERTIES
+    time_column = StringProperty("")
 
     # SLIDER PROPERTIES
     color_slider_max = NumericProperty(0)
@@ -117,15 +113,18 @@ class MainScreen(Screen):
         #try:
         utilities.wipe("graphs/")                     # Cleans directory
         if self.plot_type == "Heatmap":
-            # subset = utilities.data_filter(G_DATA, self.plot_type,
-            #                                (self.color_column, self.x_column, self.y_column, self.filter_column),
-            #                                (self.color_slider_min, self.color_slider_max,
-            #                                 self.x_range_slider_min, self.x_range_slider_max,
-            #                                 self.y_range_slider_min, self.y_range_slider_max,
-            #                                 self.filter_slider_min, self.filter_slider_max))
+            subset = utilities.data_filter(G_DATA, cols = (self.color_column, self.x_column, self.y_column, self.filter_column),
+                                                   minmax = (self.ids.heatmap_color_slider.value[0]/100*self.color_slider_max+self.color_slider_min,
+                                                             self.ids.heatmap_color_slider.value[1]/100*self.color_slider_max+self.color_slider_min,
+                                                             self.ids.heatmap_x_range_slider.value[0]/100*self.x_range_slider_max+self.x_range_slider_min,
+                                                             self.ids.heatmap_x_range_slider.value[1]/100*self.x_range_slider_max+self.x_range_slider_min,
+                                                             self.ids.heatmap_y_range_slider.value[0]/100*self.y_range_slider_max+self.y_range_slider_min,
+                                                             self.ids.heatmap_y_range_slider.value[1]/100*self.y_range_slider_max+self.y_range_slider_min,
+                                                             self.ids.heatmap_filter_slider.value[0]/100*self.filter_slider_max+self.filter_slider_min,
+                                                             self.ids.heatmap_filter_slider.value[1]/100*self.filter_slider_max+self.filter_slider_min))
 
             plots.create_static_plot(self.plot_type,
-                                     df = G_DATA,
+                                     df = subset,
                                      X = self.x_column,
                                      Y = self.y_column,
                                      values = self.color_column,
@@ -138,8 +137,16 @@ class MainScreen(Screen):
             else:
                 highlight=[]
 
+            subset = utilities.data_filter(G_DATA, cols = (self.color_column, self.edge_column, self.filter_column),
+                                                   minmax = (self.ids.node_link_color_slider.value[0]/100*self.color_slider_max+self.color_slider_min,
+                                                             self.ids.node_link_color_slider.value[1]/100*self.color_slider_max+self.color_slider_min,
+                                                             self.ids.node_link_edge_slider.value[0]/100*self.edge_slider_max+self.edge_slider_min,
+                                                             self.ids.node_link_edge_slider.value[1]/100*self.edge_slider_max+self.edge_slider_min,
+                                                             self.ids.node_link_filter_slider.value[0]/100*self.filter_slider_max+self.filter_slider_min,
+                                                             self.ids.node_link_filter_slider.value[1]/100*self.filter_slider_max+self.filter_slider_min))
+
             plots.create_static_plot(self.plot_type,
-                                     df = G_DATA,
+                                     df = subset,
                                      start_node = self.start_node_column,
                                      end_node = self.end_node_column,
                                      layout=self.node_link_layout,
@@ -151,12 +158,23 @@ class MainScreen(Screen):
                                      color_edges=self.node_link_color_edges,
                                      cmap=self.color_scheme,
                                      highlight=highlight)
-        self.plot_img = "graphs/" + os.listdir("graphs/")[0]
-        # except:
-        #     print("Error")
+        else:
+            subset = utilities.data_filter(G_DATA, cols = (self.color_column, self.edge_column, self.filter_column),
+                                                   minmax = (self.ids.interleaved_network_color_slider.value[0]/100*self.color_slider_max+self.color_slider_min,
+                                                             self.ids.interleaved_network_color_slider.value[1]/100*self.color_slider_max+self.color_slider_min,
+                                                             self.ids.interleaved_network_edge_slider.value[0]/100*self.edge_slider_max+self.edge_slider_min,
+                                                             self.ids.interleaved_network_edge_slider.value[1]/100*self.edge_slider_max+self.edge_slider_min,
+                                                             self.ids.interleaved_network_filter_slider.value[0]/100*self.filter_slider_max+self.filter_slider_min,
+                                                             self.ids.interleaved_network_filter_slider.value[1]/100*self.filter_slider_max+self.filter_slider_min))
 
-    # def oops(self, hey):
-    #     print("App says: Ooops! Can't drop there!" + hey)
+            plots.create_static_plot(self.plot_type,
+                                     df = subset,
+                                     start_node = self.start_node_column,
+                                     end_node = self.end_node_column,
+                                     edge_weight = self.edge_column,
+                                     time = self.time_column,
+                                     colormap = self.color_scheme)
+        self.plot_img = "graphs/" + os.listdir("graphs/")[0]
 
     def _load_data(self):
         global G_DATA
@@ -182,7 +200,9 @@ class MainScreen(Screen):
                                                                   self.ids.which_X, self.ids.which_Y,
                                                                   self.ids.which_start_node, self.ids.which_end_node,
                                                                   self.ids.which_edges, self.ids.which_size,
-                                                                  self.ids.whole_screen],
+                                                                  self.ids.whole_screen, self.ids.which_time,
+                                                                  self.ids.which_start_node_in, self.ids.which_end_node_in,
+                                                                  self.ids.which_edges_in],
                                           column=G_DATA.columns[i],
                                           origin=(325,Window.height-(280+20*i)))
             self.add_widget(drag_button)
@@ -199,7 +219,9 @@ class MainScreen(Screen):
                                                               self.ids.which_X, self.ids.which_Y,
                                                               self.ids.which_start_node, self.ids.which_end_node,
                                                               self.ids.which_edges, self.ids.which_size,
-                                                              self.ids.whole_screen],
+                                                              self.ids.whole_screen, self.ids.which_time,
+                                                              self.ids.which_start_node_in, self.ids.which_end_node_in,
+                                                              self.ids.which_edges_in],
                                       column=DroppedObject.column,
                                       origin=DroppedObject.origin)
         self.add_widget(drag_button)
@@ -240,8 +262,17 @@ class MainScreen(Screen):
         self.node_slider_max=max(G_DATA[DroppedObject.column])
         self.node_slider_min=min(G_DATA[DroppedObject.column])
 
+    def which_time_update(self, DroppedObject):
+        self.time_column=DroppedObject.column
+
     def show_data(self):
         dfgui.show(G_DATA)
+
+    def _change_modus(self):
+        if(self.modus == "Detail"):
+            self.modus = "Plot"
+        else:
+            self.modus = "Detail"
 
 class ScreenManagement(ScreenManager):
     pass
@@ -253,6 +284,7 @@ class GUI(App):
     def __init__(self, **kwargs):
         super(GUI, self).__init__(**kwargs)
         self.icon = 'templates/lilac_brested_roller.png'
+        Window.clearcolor = (1,1,1,1)
 
     # BUILDING THE GUI (ADDING FUNCTIONALITIES HERE)
     def build(self):
@@ -273,4 +305,3 @@ class GUI(App):
 
 if __name__ == "__main__":
     GUI().run()
-    gc.collect()

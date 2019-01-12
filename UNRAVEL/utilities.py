@@ -29,7 +29,11 @@ def wipe(path):
 
 def data_filter(df, cols, minmax):
     for i in range(len(cols)):
-        df = df.loc[(df[df.columns[i]] >= minmax[2*i]) & (df[df.columns[i]] <= minmax[2*i+1]),]
+        if cols[i] != "":
+            df = df[(df[cols[i]] >= minmax[2*i]) & (df[cols[i]] <= minmax[2*i+1])]
+
+    print(len(df))
+    return df
 
 def newline_insert(text, split_char, n):
     lst = text.split(split_char)
